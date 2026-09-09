@@ -101,6 +101,7 @@ class DatabaseManager:
     def _init_default_settings(self):
         default_settings = {
             "theme": "dark",
+            "accent": "spotify",
             "language": "pt-BR",
             "notifications": True,
             "study_reminders": True,
@@ -109,6 +110,15 @@ class DatabaseManager:
         }
         if not self.settings_file.exists():
             self._save_settings(default_settings)
+        else:
+            # migracao: adiciona accent se faltar
+            try:
+                with open(self.settings_file, 'r', encoding='utf-8') as f:
+                    s = json.load(f)
+                if "accent" not in s:
+                    s["accent"] = "spotify"
+                    self._save_settings(s)
+            except: pass
 
     def _save_progress(self, data: Dict) -> None:
         data["last_updated"] = datetime.now().isoformat()
