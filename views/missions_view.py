@@ -468,7 +468,6 @@ class MissionsView(ctk.CTkFrame):
             badge.grid(row=0, column=1, padx=6)
             full = LEVEL_LABELS.get(level, level)
             ctk.CTkLabel(row, text=full, font=ctk.CTkFont(size=10), text_color=("gray45","gray60")).grid(row=0, column=2, padx=(0,6))
-            ctk.CTkLabel(row, text="nível clicável", font=ctk.CTkFont(size=9), text_color=("#1f538d","#4cc2ff")).grid(row=0, column=3, padx=4)
             detail = ctk.CTkFrame(outer, fg_color=("#fef9e7","#1e1a0a"), corner_radius=6, border_width=1, border_color=("#f0c040","#8a6d00"))
             if is_open:
                 detail.grid(row=1, column=0, sticky="ew", padx=6, pady=(0,6))
