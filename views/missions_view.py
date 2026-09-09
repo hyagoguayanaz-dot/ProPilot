@@ -237,6 +237,10 @@ def _help_for(ex_name: str):
     return ("Falta de técnica ou esquecimento de checklist na fase Pré-Solo.", "Siga o POH/checklist da aeronave e repita a manobra com instrutor até automatizar.")
 
 
+# Cache global para evitar releitura em cada navegação (zero-lag)
+_MISSIONS_CACHE = None
+_SOP_CACHE = None
+
 class MissionsView(ctk.CTkFrame):
     def __init__(self, parent, on_back: Callable=None, theme_manager=None):
         super().__init__(parent)
@@ -244,39 +248,47 @@ class MissionsView(ctk.CTkFrame):
         self.theme_manager = theme_manager
         from database import get_database
         self.db = get_database()
-        self.missions_data = {}
-        self.sop_data = {}
         self._selected_id = None
         self._search_job = None
-        # load data once
-        try:
-            p = resource_path(os.path.join("data","missions.json"))
-            if not os.path.exists(p):
-                p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","missions.json")
-            with open(p, encoding="utf-8") as f:
-                self.missions_data = json.load(f)
-        except Exception as e:
-            print("missions load err", e)
-            self.missions_data = {"missions":{},"requirements":{},"info":{}}
-        # SOP exercicios
-        try:
-            sp = resource_path(os.path.join("data","sop_exercises.json"))
-            if not os.path.exists(sp):
-                sp = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","sop_exercises.json")
-            with open(sp, encoding="utf-8") as f:
-                self.sop_data = json.load(f)
-        except Exception as e:
-            # fallback tenta sop.json
+        self._card_refs = {}  # para highlight sem rebuild
+        # load data via cache (instantâneo após primeira leitura)
+        global _MISSIONS_CACHE, _SOP_CACHE
+        if _MISSIONS_CACHE is not None:
+            self.missions_data = _MISSIONS_CACHE
+        else:
             try:
-                sp2 = resource_path(os.path.join("data","sop.json"))
-                if not os.path.exists(sp2):
-                    sp2 = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","sop.json")
-                with open(sp2, encoding="utf-8") as f:
-                    raw = json.load(f)
-                    # converte para lower keys curtos
-                    self.sop_data = {k.lower(): v for k,v in raw.items()}
-            except:
-                self.sop_data = {}
+                p = resource_path(os.path.join("data","missions.json"))
+                if not os.path.exists(p):
+                    p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","missions.json")
+                with open(p, encoding="utf-8") as f:
+                    self.missions_data = json.load(f)
+                _MISSIONS_CACHE = self.missions_data
+            except Exception as e:
+                print("missions load err", e)
+                self.missions_data = {"missions":{},"requirements":{},"info":{}}
+                _MISSIONS_CACHE = self.missions_data
+        if _SOP_CACHE is not None:
+            self.sop_data = _SOP_CACHE
+        else:
+            try:
+                sp = resource_path(os.path.join("data","sop_exercises.json"))
+                if not os.path.exists(sp):
+                    sp = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","sop_exercises.json")
+                with open(sp, encoding="utf-8") as f:
+                    self.sop_data = json.load(f)
+                _SOP_CACHE = self.sop_data
+            except Exception as e:
+                try:
+                    sp2 = resource_path(os.path.join("data","sop.json"))
+                    if not os.path.exists(sp2):
+                        sp2 = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","sop.json")
+                    with open(sp2, encoding="utf-8") as f:
+                        raw = json.load(f)
+                        self.sop_data = {k.lower(): v for k,v in raw.items()}
+                    _SOP_CACHE = self.sop_data
+                except:
+                    self.sop_data = {}
+                    _SOP_CACHE = {}
         self._build()
 
     def _sop_for(self, ex_name: str) -> str:
@@ -371,9 +383,10 @@ class MissionsView(ctk.CTkFrame):
         self._refresh()
 
     def _refresh(self):
-        # cache progresso (evita I/O repetido)
+        # cache progresso (usa cache do database - 0.002s)
         self._cached_progress = self.db.load_progress()
         term = (self.search.get() or "").strip().lower()
+        self._card_refs.clear()
         for w in self.left_scroll.winfo_children():
             w.destroy()
         # reset right only if first load
@@ -394,9 +407,12 @@ class MissionsView(ctk.CTkFrame):
                 missions = [m for m in missions if term in m.get("name","").lower() or term in m.get("description","").lower() or term in " ".join(m.get("exercises",[])).lower()]
                 if not missions: continue
             ctk.CTkLabel(self.left_scroll, text=f"{ph} — {pdata.get('name','')}", font=ctk.CTkFont(weight="bold", size=13), text_color=colors.get(ph,"#fff")).pack(anchor="w", padx=8, pady=(12,4))
-            for m in missions:
+            for idx_m, m in enumerate(missions):
                 found += 1
                 self._card(m, ph)
+                if idx_m % 7 == 0:
+                    try: self.update_idletasks()
+                    except: pass
         if found==0:
             ctk.CTkLabel(self.left_scroll, text="Nenhuma missao encontrada.", text_color=("gray50","gray60")).pack(pady=20)
 
@@ -405,13 +421,21 @@ class MissionsView(ctk.CTkFrame):
         is_sel = self._selected_id == m["id"]
         card = ctk.CTkFrame(self.left_scroll, corner_radius=10, border_width=2 if is_sel else 1, border_color="#4cc2ff" if is_sel else ("gray75","gray30"))
         card.pack(fill="x", padx=6, pady=5)
-        # bind whole card
+        self._card_refs[m["id"]] = card
+        # bind whole card - highlight leve sem rebuild completo (zero-lag)
         def select(_e=None, mid=m["id"]):
+            prev = self._selected_id
             self._selected_id = mid
             self._show_detail(m)
-            self._refresh()  # redraw to highlight
-            # keep detail after refresh - already shown
-            self._show_detail(m)
+            # Atualiza apenas bordas dos cards (sem recriar 36 widgets)
+            try:
+                if prev in self._card_refs and self._card_refs[prev].winfo_exists():
+                    self._card_refs[prev].configure(border_width=1, border_color=("gray75","gray30"))
+                if mid in self._card_refs and self._card_refs[mid].winfo_exists():
+                    self._card_refs[mid].configure(border_width=2, border_color="#4cc2ff")
+            except: 
+                # fallback: rebuild leve
+                self._refresh()
         card.bind("<Button-1>", select)
         top = ctk.CTkFrame(card, fg_color="transparent"); top.pack(fill="x", padx=10, pady=(8,2))
         top.grid_columnconfigure(1, weight=1)

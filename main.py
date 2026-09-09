@@ -128,10 +128,17 @@ class ProPilotApp(ctk.CTk):
         self.db = get_database()
         self._active_nav = "dashboard"
         self.nav_buttons = {}
+        self._view_cache = {}
+        self._active_view = None
+        self._active_key = None
+        self._data_cache = {}  # global json cache
+        self._logo_ctk = None
         self._configure_window()
         self.theme_manager.apply(self)
         self._setup_ui()
-        self.after(10, self.show_dashboard)  # after_idle para fluidez no startup
+        self.after(10, self.show_dashboard)
+        # Pré-carrega views em background após 800ms para navegação instantânea
+        self.after(800, self._preload_views)
 
     def _configure_window(self):
         self.title("Pro Pilot")
@@ -169,17 +176,17 @@ class ProPilotApp(ctk.CTk):
         self.sidebar.grid_propagate(False)
         self.sidebar.grid_rowconfigure(99, weight=1)
 
-        # Logo
+        # Logo (cache com CTkImage para HighDPI sem lag)
         logo = ctk.CTkFrame(self.sidebar, fg_color="transparent")
         logo.pack(fill="x", padx=16, pady=(18,10))
-        # ícone + texto
         try:
-            from PIL import Image, ImageTk
+            from PIL import Image
             png = Path(__file__).parent / "assets" / "icon.png"
-            if png.exists():
-                im = Image.open(png).resize((28,28))
-                self._logo_img = ImageTk.PhotoImage(im)
-                ctk.CTkLabel(logo, image=self._logo_img, text="").pack(side="left")
+            if png.exists() and self._logo_ctk is None:
+                im = Image.open(png)
+                self._logo_ctk = ctk.CTkImage(light_image=im, dark_image=im, size=(28,28))
+            if self._logo_ctk:
+                ctk.CTkLabel(logo, image=self._logo_ctk, text="").pack(side="left")
         except: pass
         ctk.CTkLabel(logo, text="Pro Pilot", font=ctk.CTkFont(size=18, weight="bold"), text_color=cols["text"]).pack(side="left", padx=8)
         ctk.CTkLabel(self.sidebar, text="PILOTO PRIVADO • PPA", font=ctk.CTkFont(size=10), text_color=cols["subtext"]).pack(anchor="w", padx=16, pady=(0,14))
@@ -290,12 +297,19 @@ class ProPilotApp(ctk.CTk):
         self.top_sub.configure(text_color=cols["subtext"])
         self._highlight_nav(self._active_nav)
         self._update_phase()
-        # recarrega view atual para recriar cards com cores corretas (evita itens brancos)
+        # Invalida cache de views (cores precisam recriar)
+        for v in list(self._view_cache.values()):
+            try: v.destroy()
+            except: pass
+        self._view_cache.clear()
+        self._active_view = None; self._active_key = None
+        # recarrega view atual com novas cores
         try:
             cur = self._active_nav
-            # evita loop se já estiver reconstruindo settings (que já se reconstrói sozinho)
             if cur != "settings":
                 self._navigate_to(cur)
+            else:
+                self.show_settings()
         except: pass
 
     def _highlight_nav(self, active):
@@ -321,23 +335,75 @@ class ProPilotApp(ctk.CTk):
         self.top_sub.configure(text=subs.get(section,""))
         {"dashboard": self.show_dashboard, "missions": self.show_missions, "study": self.show_study_center, "manuals": self.show_manuals, "sop": self.show_sop, "settings": self.show_settings}[section]()
 
+    def _show_view(self, key, factory):
+        # Se já é a mesma view, não faz nada (evita flicker)
+        if self._active_key == key and self._active_view is not None and self._active_view.winfo_exists():
+            return
+        self._clear()
+        if key in self._view_cache and self._view_cache[key].winfo_exists():
+            v = self._view_cache[key]
+            v.grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+            self._active_view = v
+            self._active_key = key
+            # Refresh suave se a view expõe método
+            try:
+                if hasattr(v, 'on_show'):
+                    v.on_show()
+            except: pass
+            self.content_frame.update_idletasks()
+            return
+        # cria nova (lazy, mas já pré-carregada após dashboard)
+        v = factory()
+        v.grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._view_cache[key] = v
+        self._active_view = v
+        self._active_key = key
+        self.content_frame.update_idletasks()
+
     def show_dashboard(self):
-        self._clear(); self._render_dashboard(); self._update_phase()
+        # Dashboard não é cacheado (conteúdo dinâmico) - destrói e recria rápido
+        # Força limpar cache ativo
+        if self._active_view is not None:
+            try: self._active_view.grid_forget()
+            except: pass
+            self._active_view = None; self._active_key = None
+        for w in self.content_frame.winfo_children():
+            # Remove qualquer view cacheada que ficou grid_forget, mas dashboard é novo
+            if w not in self._view_cache.values():
+                w.destroy()
+        self._render_dashboard(); self._update_phase()
+
     def show_missions(self):
-        self._clear(); _lazy_import_views()[0](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8); self._update_phase()
+        self._show_view('missions', lambda: _lazy_import_views()[0](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager))
+        self._update_phase()
     def show_study_center(self):
-        self._clear(); _lazy_import_views()[1](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._show_view('study', lambda: _lazy_import_views()[1](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager))
     def show_manuals(self):
-        self._clear(); _lazy_import_views()[3](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._show_view('manuals', lambda: _lazy_import_views()[3](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager))
     def show_sop(self):
-        self._clear(); _lazy_import_views()[4](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._show_view('sop', lambda: _lazy_import_views()[4](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager))
     def show_settings(self):
-        self._clear(); _lazy_import_views()[2](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._show_view('settings', lambda: _lazy_import_views()[2](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager))
     def _clear(self):
-        for w in self.content_frame.winfo_children(): w.destroy()
+        # Se há view cacheada ativa, apenas oculta (instantâneo, sem destruir)
+        if self._active_view is not None:
+            try:
+                self._active_view.grid_forget()
+            except: pass
+            self._active_view = None
+            self._active_key = None
+        else:
+            for w in self.content_frame.winfo_children():
+                w.destroy()
+        # GC apenas ocasional para não travar
         try:
             import gc
-            gc.collect()
+            if hasattr(self, '_clear_count'):
+                self._clear_count += 1
+            else:
+                self._clear_count = 1
+            if self._clear_count % 6 == 0:
+                gc.collect()
         except: pass
 
     def _render_dashboard(self):
@@ -450,6 +516,25 @@ class ProPilotApp(ctk.CTk):
 
     def _phase_name(self,c): return {"PS":"Pré-Solo","AP":"Aperfeiçoamento","NV":"Navegação","NOT":"Noturno"}.get(c,c)
     def _show_maneuver_details(self,m): pass
+
+    def _preload_views(self):
+        # Pré-importa e instancia views em idle para zero-lag na primeira navegação
+        try:
+            _lazy_import_views()
+            # Pré-instancia sem mostrar (cria widgets em background)
+            for key, idx in [('missions',0),('study',1),('manuals',3),('sop',4),('settings',2)]:
+                if key not in self._view_cache:
+                    try:
+                        cls = _lazy_import_views()[idx]
+                        v = cls(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager)
+                        self._view_cache[key] = v
+                        # mantém oculto até navegar
+                        v.grid_forget()
+                        self.update_idletasks()
+                    except Exception as e:
+                        print(f'preload {key} err', e)
+        except Exception as e:
+            print('preload err', e)
 
 def main():
     app = ProPilotApp()
