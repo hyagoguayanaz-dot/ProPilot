@@ -13,11 +13,13 @@ try:
     from views.missions_view import MissionsView
     from views.study_center_view import StudyCenterView
     from views.settings_view import SettingsView
+    from views.manuals_view import ManualsView
 except ImportError:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from views.missions_view import MissionsView
     from views.study_center_view import StudyCenterView
     from views.settings_view import SettingsView
+    from views.manuals_view import ManualsView
 
 try:
     from database import get_database
@@ -107,8 +109,8 @@ class ProPilotApp(ctk.CTk):
         nav = ctk.CTkFrame(main_container, width=210, corner_radius=10)
         nav.grid(row=1, column=0, sticky="ns", padx=(10,5), pady=(0,10))
         nav.grid_propagate(False)
-        for t,k in [("Dashboard","dashboard"),("Missoes & Progresso","missions"),("Central de Estudos","study"),("Configuracoes","settings")]:
-            ctk.CTkButton(nav, text=t, anchor="w", height=42, command=lambda kk=k: self._navigate_to(kk)).pack(fill="x", padx=10, pady=6)
+        for t,k in [("Dashboard","dashboard"),("Missoes & Progresso","missions"),("Central de Estudos","study"),("QRH / Manuais","manuals"),("Configuracoes","settings")]:
+            ctk.CTkButton(nav, text=t, anchor="w", height=38, command=lambda kk=k: self._navigate_to(kk)).pack(fill="x", padx=10, pady=5)
         ctk.CTkLabel(nav, text="© Guayanaz Systems", font=ctk.CTkFont(size=11), text_color=("gray50","gray60"), justify="center").pack(side="bottom", pady=14)
 
         # Content
@@ -123,7 +125,7 @@ class ProPilotApp(ctk.CTk):
         self.theme_btn.configure(text="☀️" if new=="light" else "🌙")
 
     def _navigate_to(self, section):
-        {"dashboard": self.show_dashboard, "missions": self.show_missions, "study": self.show_study_center, "settings": self.show_settings}[section]()
+        {"dashboard": self.show_dashboard, "missions": self.show_missions, "study": self.show_study_center, "manuals": self.show_manuals, "settings": self.show_settings}[section]()
 
     def show_dashboard(self):
         self._clear()
@@ -138,6 +140,10 @@ class ProPilotApp(ctk.CTk):
     def show_study_center(self):
         self._clear()
         StudyCenterView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+
+    def show_manuals(self):
+        self._clear()
+        ManualsView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
 
     def show_settings(self):
         self._clear()
