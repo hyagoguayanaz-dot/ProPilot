@@ -14,12 +14,14 @@ try:
     from views.study_center_view import StudyCenterView
     from views.settings_view import SettingsView
     from views.manuals_view import ManualsView
+    from views.sop_view import SOPView
 except ImportError:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from views.missions_view import MissionsView
     from views.study_center_view import StudyCenterView
     from views.settings_view import SettingsView
     from views.manuals_view import ManualsView
+    from views.sop_view import SOPView
 
 try:
     from database import get_database
@@ -180,6 +182,7 @@ class ProPilotApp(ctk.CTk):
             ("◫","Missões","missions"),
             ("▤","Central de Estudos","study"),
             ("▭","QRH / Manuais","manuals"),
+            ("≡","SOP","sop"),
             ("⚙","Configurações","settings"),
         ]
         for icon, label, key in nav_items:
@@ -304,11 +307,11 @@ class ProPilotApp(ctk.CTk):
 
     def _navigate_to(self, section):
         self._highlight_nav(section)
-        titles = {"dashboard":"Boa tarde, piloto","missions":"Suas missões","study":"Central de Estudos","manuals":"QRH / Manuais","settings":"Configurações"}
+        titles = {"dashboard":"Boa tarde, piloto","missions":"Suas missões","study":"Central de Estudos","manuals":"QRH / Manuais","sop":"SOP","settings":"Configurações"}
         self.top_title.configure(text=titles.get(section,"Pro Pilot"))
-        subs = {"dashboard":"Organize seu progresso","missions":"Toque no card para detalhes","study":"Toque na manobra para passo-a-passo","manuals":"Manuais por aeronave","settings":"Tema, cores e perfil"}
+        subs = {"dashboard":"Organize seu progresso","missions":"Toque no card para detalhes","study":"Toque na manobra para passo-a-passo","manuals":"Manuais por aeronave","sop":"Procedimentos padronizados ACP 2023","settings":"Tema, cores e perfil"}
         self.top_sub.configure(text=subs.get(section,""))
-        {"dashboard": self.show_dashboard, "missions": self.show_missions, "study": self.show_study_center, "manuals": self.show_manuals, "settings": self.show_settings}[section]()
+        {"dashboard": self.show_dashboard, "missions": self.show_missions, "study": self.show_study_center, "manuals": self.show_manuals, "sop": self.show_sop, "settings": self.show_settings}[section]()
 
     def show_dashboard(self):
         self._clear(); self._render_dashboard(); self._update_phase()
@@ -318,6 +321,8 @@ class ProPilotApp(ctk.CTk):
         self._clear(); StudyCenterView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
     def show_manuals(self):
         self._clear(); ManualsView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+    def show_sop(self):
+        self._clear(); SOPView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
     def show_settings(self):
         self._clear(); SettingsView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
     def _clear(self):
@@ -330,6 +335,19 @@ class ProPilotApp(ctk.CTk):
         f = ctk.CTkScrollableFrame(self.content_frame, fg_color="transparent")
         f.grid(row=0,column=0,sticky="nsew", padx=4, pady=4)
 
+        # Saudação personalizada por horário + nome do piloto
+        from datetime import datetime
+        hour = datetime.now().hour
+        if 5 <= hour < 12:
+            greet = "Bom dia"
+        elif 12 <= hour < 18:
+            greet = "Boa tarde"
+        else:
+            greet = "Boa noite"
+        prof_name = self.db.load_progress().get("profile",{}).get("display_name","Piloto-Aluno") or "Piloto-Aluno"
+        # usa primeiro nome para saudação mais pessoal, mas mantém completo no subtítulo
+        first = prof_name.split()[0]
+
         # Hero card (gradiente simulado com frame color)
         hero = ctk.CTkFrame(f, fg_color=cols["card"], corner_radius=12)
         hero.pack(fill="x", padx=12, pady=12)
@@ -339,10 +357,8 @@ class ProPilotApp(ctk.CTk):
         # faixa superior com accent
         ctk.CTkLabel(inner, text="", height=4, fg_color=acc).pack(fill="x")
         # conteúdo hero
-        ctk.CTkLabel(hero, text="Bem-vindo de volta", font=ctk.CTkFont(size=13), text_color=cols["subtext"]).pack(anchor="w", padx=18, pady=(14,2))
-        prog = self.db.load_progress()
-        name = prog.get("profile",{}).get("display_name","Piloto-Aluno")
-        ctk.CTkLabel(hero, text=name, font=ctk.CTkFont(size=22, weight="bold"), text_color=cols["text"]).pack(anchor="w", padx=18)
+        ctk.CTkLabel(hero, text=f"{greet}, {first}!", font=ctk.CTkFont(size=13), text_color=cols["subtext"]).pack(anchor="w", padx=18, pady=(14,2))
+        ctk.CTkLabel(hero, text=prof_name, font=ctk.CTkFont(size=22, weight="bold"), text_color=cols["text"]).pack(anchor="w", padx=18)
         ctk.CTkLabel(hero, text="Sua jornada rumo ao voo solo continua — escolha uma missão ou revise uma manobra", font=ctk.CTkFont(size=12), text_color=cols["subtext"], wraplength=700, justify="left").pack(anchor="w", padx=18, pady=(4,14))
         btns = ctk.CTkFrame(hero, fg_color="transparent"); btns.pack(fill="x", padx=18, pady=(0,14))
         ctk.CTkButton(btns, text="▶  Ver Missões", fg_color=acc, hover_color=acc_hover, text_color="white", corner_radius=20, height=36, width=150, command=self.show_missions).pack(side="left", padx=(0,8))

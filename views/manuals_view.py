@@ -18,8 +18,10 @@ class ManualsView(ctk.CTkFrame):
         self.on_back = on_back
         self.theme_manager = theme_manager
         self.data = {}
+        self.sop_data = {}
+        self.sop_ex_data = {}
         self._selected_id = None
-        self._section = "manual"  # manual | qrh | perf | limites
+        self._section = "manual"  # manual | qrh | sop | limites | perf
         try:
             p = resource_path(os.path.join("data","manuals.json"))
             if not os.path.exists(p):
@@ -29,6 +31,23 @@ class ManualsView(ctk.CTkFrame):
         except Exception as e:
             print("manuals load err", e)
             self.data = {"aircraft":[]}
+        # SOP para incorporar
+        try:
+            sp = resource_path(os.path.join("data","sop.json"))
+            if not os.path.exists(sp):
+                sp = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","sop.json")
+            with open(sp, encoding="utf-8") as f:
+                self.sop_data = json.load(f)
+        except:
+            self.sop_data = {}
+        try:
+            sp2 = resource_path(os.path.join("data","sop_exercises.json"))
+            if not os.path.exists(sp2):
+                sp2 = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","sop_exercises.json")
+            with open(sp2, encoding="utf-8") as f:
+                self.sop_ex_data = json.load(f)
+        except:
+            self.sop_ex_data = {}
         self._build()
         # auto-select first
         if self.data.get("aircraft"):
@@ -112,8 +131,8 @@ class ManualsView(ctk.CTkFrame):
         ctk.CTkLabel(warn, text="⚠️ QRH de estudo — sempre consulte o POH/AFM oficial e checklist plastificado da aeronave antes do voo.", wraplength=520, justify="left", font=ctk.CTkFont(size=11, weight="bold")).pack(padx=10, pady=8)
         # segmented control
         seg = ctk.CTkFrame(self.right, fg_color="transparent"); seg.pack(fill="x", padx=6, pady=6)
-        for key,label in [("manual","Manual"),("qrh","QRH Emergência"),("limites","Limitações"),("perf","Performance")]:
-            btn = ctk.CTkButton(seg, text=label, width=110, height=28,
+        for key,label in [("manual","Manual"),("qrh","QRH Emergência"),("sop","SOP"),("limites","Limitações"),("perf","Performance")]:
+            btn = ctk.CTkButton(seg, text=label, width=90, height=28,
                                 fg_color="#4cc2ff" if self._section==key else ("gray75","gray30"),
                                 text_color="white" if self._section==key else ("black","white"),
                                 command=lambda k=key, a=ac: self._switch(k,a))
@@ -123,6 +142,8 @@ class ManualsView(ctk.CTkFrame):
             self._render_manual(ac)
         elif self._section == "qrh":
             self._render_qrh(ac)
+        elif self._section == "sop":
+            self._render_sop(ac)
         elif self._section == "limites":
             self._render_limites(ac)
         elif self._section == "perf":
@@ -166,6 +187,43 @@ class ManualsView(ctk.CTkFrame):
                 ctk.CTkLabel(r, text=step, wraplength=430, justify="left", font=ctk.CTkFont(size=11, weight="bold" if is_mem else "normal"), anchor="w").pack(side="left", padx=(0,8), pady=4, fill="x", expand=True)
             if is_mem:
                 ctk.CTkLabel(box, text="Item de memória — decore e execute sem consultar.", font=ctk.CTkFont(size=10, slant="italic"), text_color="#c0392b").pack(anchor="w", padx=10, pady=(2,6))
+
+    def _render_sop(self, ac):
+        # Header SOP
+        sop_hdr = ctk.CTkFrame(self.right, fg_color=("#e8f4fd","#0f1e2e"), border_width=1, border_color="#4cc2ff")
+        sop_hdr.pack(fill="x", padx=6, pady=6)
+        ctk.CTkLabel(sop_hdr, text="Standard Operating Procedures — ACP 2023", font=ctk.CTkFont(weight="bold", size=13)).pack(anchor="w", padx=10, pady=(8,2))
+        ctk.CTkLabel(sop_hdr, text=f"Aeronave base: P-56C Paulistinha • Esta seção incorpora o SOP oficial para {ac.get('name','')} ({ac.get('icao','')}). Para outras aeronaves, consulte o adendo específico no SOP completo (aba SOP).", wraplength=520, justify="left", font=ctk.CTkFont(size=11), text_color=("gray30","gray70")).pack(anchor="w", padx=10, pady=(0,4))
+        ctk.CTkLabel(sop_hdr, text="Os procedimentos abaixo são os mesmos cobrados nas missões — nível M/C/A/E/X conforme quadro.", wraplength=520, justify="left", font=ctk.CTkFont(size=11, slant="italic"), text_color=("gray50","gray60")).pack(anchor="w", padx=10, pady=(0,8))
+        # Se for P-56, mostra todos os SOP relevantes; se for outro, mostra apenas os genéricos + nota
+        # Mostra SOP por exercício relevante ao QRH/Manual desta aeronave
+        # Usa sop_ex_data para listar procedimentos por exercício
+        relevant = []
+        # Pega exercícios do manual + qrh desta aeronave para cruzar com SOP
+        for proc in ac.get("normal_procedures",[]):
+            title = proc.get("title","")
+            # tenta achar SOP correspondente
+            for k, txt in self.sop_ex_data.items():
+                if k.lower() in title.lower() or title.lower() in k.lower():
+                    relevant.append((title, txt))
+                    break
+        # Se não achou muitos, adiciona os SOP principais genéricos
+        if len(relevant) < 5:
+            for k in ["inspeção interna","inspeção externa","partida do motor","decolagem normal","nivelamento","curvas de pequena","estol sem motor","pane simulada","pouso normal","arremetida"]:
+                if k in self.sop_ex_data and not any(k in r[0].lower() for r in relevant):
+                    relevant.append((k.title(), self.sop_ex_data[k]))
+                if len(relevant) >= 8:
+                    break
+        for title, txt in relevant[:10]:
+            box = ctk.CTkFrame(self.right); box.pack(fill="x", padx=6, pady=5)
+            ctk.CTkLabel(box, text=title, font=ctk.CTkFont(weight="bold", size=12), text_color="#4cc2ff").pack(anchor="w", padx=10, pady=(8,4))
+            # quebra texto em blocos
+            display = txt[:700] + ("…" if len(txt)>700 else "")
+            ctk.CTkLabel(box, text=display, wraplength=500, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,8))
+        # Link para SOP completo
+        foot = ctk.CTkFrame(self.right, fg_color=("#fff3cd","#332a00"), border_width=1, border_color="#ffc107")
+        foot.pack(fill="x", padx=6, pady=8)
+        ctk.CTkLabel(foot, text="Ver SOP completo na nova aba 'SOP' no menu lateral — 74 seções com busca.", wraplength=500, justify="left", font=ctk.CTkFont(size=11, weight="bold")).pack(padx=10, pady=8)
 
     def _render_limites(self, ac):
         box = ctk.CTkFrame(self.right); box.pack(fill="x", padx=6, pady=6)
