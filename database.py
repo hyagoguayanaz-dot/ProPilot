@@ -1,42 +1,70 @@
 """
-Database manager for Pro Pilot application.
-Handles persistence of user progress, mission completion, notes, and settings.
+Database manager for Pro Pilot - persistência corrigida para .exe
+- Em modo dev: usa ./data ao lado do código
+- Em modo .exe (frozen): usa %LOCALAPPDATA%/ProPilot (persistente)
+  e migra dados antigos de ./data se existirem
 """
-
 import json
 import os
+import sys
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime
 
+def _get_user_data_dir() -> Path:
+    """Retorna diretório persistente gravável."""
+    if getattr(sys, 'frozen', False):
+        # Rodando como .exe PyInstaller
+        base = os.environ.get("LOCALAPPDATA") or os.environ.get("APPDATA") or str(Path.home())
+        return Path(base) / "ProPilot"
+    else:
+        # Rodando como script python
+        return Path(__file__).parent / "data"
 
 class DatabaseManager:
-    """Manages user data persistence for the Pro Pilot application."""
-    
     def __init__(self, data_dir: str = None):
-        """Initialize database manager with path to data directory."""
         if data_dir is None:
-            # Use same directory as this script
-            data_dir = Path(__file__).parent / "data"
-        
+            data_dir = _get_user_data_dir()
         self.data_dir = Path(data_dir)
         self.progress_file = self.data_dir / "user_progress.json"
         self.settings_file = self.data_dir / "user_settings.json"
-        
-        # Ensure data directory exists
         self.data_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Initialize data structures
+
+        # Migração: se estiver em modo frozen e existir ./data antigo com progresso, copia
+        try:
+            if getattr(sys, 'frozen', False):
+                legacy = Path(__file__).parent / "data"
+                # tenta também pasta ao lado do exe
+                exe_dir = Path(sys.executable).parent / "data"
+                for src_dir in [legacy, exe_dir]:
+                    for fname in ["user_progress.json", "user_settings.json"]:
+                        src = src_dir / fname
+                        dst = self.data_dir / fname
+                        if src.exists() and not dst.exists():
+                            try:
+                                dst.write_bytes(src.read_bytes())
+                            except: pass
+                # também tenta %APPDATA%/ProPilot antigo sem LOCAL
+                alt = Path(os.environ.get("APPDATA","")) / "ProPilot" if os.environ.get("APPDATA") else None
+                if alt and alt != self.data_dir and alt.exists():
+                    for fname in ["user_progress.json", "user_settings.json"]:
+                        src = alt / fname
+                        dst = self.data_dir / fname
+                        if src.exists() and not dst.exists():
+                            try:
+                                dst.write_bytes(src.read_bytes())
+                            except: pass
+        except: pass
+
         self._init_default_progress()
         self._init_default_settings()
-    
+
     def _init_default_progress(self):
-        """Initialize default user progress data."""
         default_progress = {
             "completed_missions": [],
             "mission_notes": {},
             "study_progress": {
-                "PS": {"completed": 0, "total": 3, "exercises_mastered": []},
+                "PS": {"completed": 0, "total": 4, "exercises_mastered": []},
                 "AP": {"completed": 0, "total": 1, "exercises_mastered": []},
                 "NV": {"completed": 0, "total": 1, "exercises_mastered": []},
                 "NOT": {"completed": 0, "total": 1, "exercises_mastered": []}
@@ -51,12 +79,26 @@ class DatabaseManager:
                 "pilot_license_status": "student"
             }
         }
-        
         if not self.progress_file.exists():
             self._save_progress(default_progress)
-    
+        else:
+            # garante que arquivo existente tenha chaves novas (migração leve)
+            try:
+                with open(self.progress_file, 'r', encoding='utf-8') as f:
+                    existing = json.load(f)
+                changed = False
+                for k,v in default_progress.items():
+                    if k not in existing:
+                        existing[k] = v; changed=True
+                # profile subkeys
+                for pk, pv in default_progress["profile"].items():
+                    if pk not in existing.get("profile",{}):
+                        existing["profile"][pk] = pv; changed=True
+                if changed:
+                    self._save_progress(existing)
+            except: pass
+
     def _init_default_settings(self):
-        """Initialize default user settings."""
         default_settings = {
             "theme": "dark",
             "language": "pt-BR",
@@ -65,27 +107,27 @@ class DatabaseManager:
             "display_name": "Piloto-Aluno",
             "school": "Aeroclube de Pirassununga"
         }
-        
         if not self.settings_file.exists():
             self._save_settings(default_settings)
-    
+
     def _save_progress(self, data: Dict) -> None:
-        """Save progress data to file."""
         data["last_updated"] = datetime.now().isoformat()
-        with open(self.progress_file, 'w', encoding='utf-8') as f:
+        # escrita atômica: temp + rename para evitar corrupção se fechar abrupto
+        tmp = self.progress_file.with_suffix(".tmp")
+        with open(tmp, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-    
+        tmp.replace(self.progress_file)
+
     def _save_settings(self, settings: Dict) -> None:
-        """Save settings to file."""
-        with open(self.settings_file, 'w', encoding='utf-8') as f:
+        tmp = self.settings_file.with_suffix(".tmp")
+        with open(tmp, 'w', encoding='utf-8') as f:
             json.dump(settings, f, indent=2, ensure_ascii=False)
-    
+        tmp.replace(self.settings_file)
+
     def load_progress(self) -> Dict:
-        """Load user progress from file."""
         try:
             with open(self.progress_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                # migracao: garante campos de perfil
                 prof = data.get("profile", {})
                 if "display_name" not in prof:
                     prof["display_name"] = self.load_settings().get("display_name", "Piloto-Aluno")
@@ -98,163 +140,110 @@ class DatabaseManager:
         except (FileNotFoundError, json.JSONDecodeError):
             self._init_default_progress()
             return self.load_progress()
-    
+
     def load_settings(self) -> Dict:
-        """Load user settings from file."""
         try:
             with open(self.settings_file, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             self._init_default_settings()
             return self.load_settings()
-    
+
     def save_settings(self, settings: Dict) -> None:
-        """Save settings to file."""
         self._save_settings(settings)
-    
+
     def toggle_mission_completion(self, mission_id: str, completed: bool = None) -> bool:
-        """
-        Toggle or set completion status of a mission.
-        
-        Args:
-            mission_id: The mission identifier (e.g., "PS-1", "NV-3")
-            completed: True to mark complete, False to mark incomplete.
-                      If None, toggles the current status.
-        
-        Returns:
-            True if operation successful
-        """
         progress = self.load_progress()
-        
-        # Toggle if not specified
         if completed is None:
             completed = mission_id not in progress["completed_missions"]
-        
         if completed and mission_id not in progress["completed_missions"]:
             progress["completed_missions"].append(mission_id)
         elif not completed and mission_id in progress["completed_missions"]:
             progress["completed_missions"].remove(mission_id)
-        
         self._save_progress(progress)
+        # atualiza barras automaticamente
+        try:
+            phase = mission_id.split("-")[0]
+            self.update_study_progress(phase)
+        except: pass
         return True
-    
+
     def is_mission_completed(self, mission_id: str) -> bool:
-        """Check if a mission is completed."""
-        progress = self.load_progress()
-        return mission_id in progress["completed_missions"]
-    
+        return mission_id in self.load_progress()["completed_missions"]
+
     def add_mission_note(self, mission_id: str, note: str) -> None:
-        """Add a note for a specific mission."""
         progress = self.load_progress()
-        
         if mission_id not in progress["mission_notes"]:
             progress["mission_notes"][mission_id] = []
-        
-        progress["mission_notes"][mission_id].append({
-            "timestamp": datetime.now().isoformat(),
-            "note": note
-        })
-        
+        progress["mission_notes"][mission_id].append({"timestamp": datetime.now().isoformat(), "note": note})
         self._save_progress(progress)
-    
+
     def get_mission_notes(self, mission_id: str) -> List[Dict]:
-        """Get all notes for a mission."""
-        progress = self.load_progress()
-        return progress["mission_notes"].get(mission_id, [])
-    
+        return self.load_progress()["mission_notes"].get(mission_id, [])
+
     def update_study_progress(self, phase: str) -> None:
-        """
-        Update study progress for a phase when missions are completed.
-        
-        Args:
-            phase: The phase identifier (PS, AP, NV, NOT)
-        """
         progress = self.load_progress()
-        
-        # Count completed missions for this phase
         phase_missions = [m for m in progress["completed_missions"] if m.startswith(phase)]
         count = len(phase_missions)
-        
-        # Map phase to expected totals
-        totals = {
-            "PS": 20,  # 20+ hours worth of basic missions
-            "AP": 10,
-            "NV": 10,
-            "NOT": 3
-        }
-        
-        total_expected = totals.get(phase, 0)
-        progress["study_progress"][phase] = {
-            "completed": count,
-            "total": total_expected,
-            "exercises_mastered": phase_missions
-        }
-        
-        # Update current phase if this is the highest completed
-        phase_order = ["PS", "AP", "NV", "NOT"]
-        current_idx = 0
-        for i, p in enumerate(phase_order):
-            if p in progress["study_progress"] and progress["study_progress"][p]["completed"] > 0:
-                current_idx = i
-        
-        if phase in phase_order and current_idx > 0:
-            completed_phases = [p for p in phase_order[:current_idx+1] 
-                              if progress["study_progress"].get(p, {}).get("completed", 0) > 0]
-            if completed_phases:
-                progress["profile"]["current_phase"] = completed_phases[-1]
-        
+        totals = {"PS": 4, "AP": 1, "NV": 1, "NOT": 1}
+        total_expected = totals.get(phase, 1)
+        # preserva total correto se já existia
+        existing_total = progress.get("study_progress",{}).get(phase,{}).get("total", total_expected)
+        progress["study_progress"][phase] = {"completed": count, "total": existing_total, "exercises_mastered": phase_missions}
+        # atualiza fase atual
+        order = ["PS","AP","NV","NOT"]
+        last = "PS"
+        for p in order:
+            if progress["study_progress"].get(p,{}).get("completed",0) > 0:
+                last = p
+        # só avança, nunca volta
+        try:
+            cur_idx = order.index(progress["profile"].get("current_phase","PS"))
+            new_idx = order.index(last)
+            if new_idx > cur_idx:
+                progress["profile"]["current_phase"] = last
+        except:
+            progress["profile"]["current_phase"] = last
         self._save_progress(progress)
-    
+
     def get_progress_summary(self) -> Dict:
-        """Get overall progress summary."""
         progress = self.load_progress()
-        
-        total_missions = 0
+        total_missions = sum(v.get("total",0) for v in progress["study_progress"].values()) or 7
         completed_missions = len(progress["completed_missions"])
-        
-        for phase, data in progress["study_progress"].items():
-            total_missions += data["total"]
-        
         progress_pct = (completed_missions / max(total_missions, 1)) * 100
-        
         return {
             "completed_missions": completed_missions,
             "total_missions_estimated": total_missions,
             "progress_percentage": round(progress_pct, 1),
-            "completed_phases": len([p for p, d in progress["study_progress"].items() 
-                                    if d["completed"] > 0]),
+            "completed_phases": len([p for p,d in progress["study_progress"].items() if d["completed"]>0]),
             "total_phases": 4,
             "current_phase": progress["profile"]["current_phase"]
         }
-    
+
     def get_phase_progress(self, phase: str) -> Dict:
-        """Get progress for a specific phase."""
-        progress = self.load_progress()
-        return progress["study_progress"].get(phase, {
-            "completed": 0, 
-            "total": 0, 
-            "exercises_mastered": []
-        })
-    
+        return self.load_progress()["study_progress"].get(phase, {"completed":0,"total":0,"exercises_mastered":[]})
+
     def clear_completed_missions(self) -> None:
-        """Clear all completed mission markers (reset progress)."""
         progress = self.load_progress()
         progress["completed_missions"] = []
         progress["study_progress"] = {
-            "PS": {"completed": 0, "total": 20, "exercises_mastered": []},
-            "AP": {"completed": 0, "total": 10, "exercises_mastered": []},
-            "NV": {"completed": 0, "total": 10, "exercises_mastered": []},
-            "NOT": {"completed": 0, "total": 3, "exercises_mastered": []}
+            "PS": {"completed": 0, "total": 4, "exercises_mastered": []},
+            "AP": {"completed": 0, "total": 1, "exercises_mastered": []},
+            "NV": {"completed": 0, "total": 1, "exercises_mastered": []},
+            "NOT": {"completed": 0, "total": 1, "exercises_mastered": []}
         }
         self._save_progress(progress)
 
+    def get_data_dir(self) -> Path:
+        return self.data_dir
 
-# Singleton instance
+# Singleton
 _db_instance = None
-
-def get_database() -> DatabaseManager:
-    """Get the singleton database instance."""
+def get_database() -> "DatabaseManager":
     global _db_instance
     if _db_instance is None:
         _db_instance = DatabaseManager()
     return _db_instance
+
+def get_user_data_dir() -> Path:
+    return _get_user_data_dir()
