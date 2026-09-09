@@ -209,20 +209,14 @@ class ProPilotApp(ctk.CTk):
         self.side_sub.pack(anchor="w", padx=12, pady=(0,10))
 
         # Footer sidebar
-        ctk.CTkLabel(self.sidebar, text="© Guayanaz Systems", font=ctk.CTkFont(size=10), text_color=cols["subtext"]).pack(side="bottom", pady=(6,2))
-        # paleta rápida no sidebar
-        pal = ctk.CTkFrame(self.sidebar, fg_color="transparent"); pal.pack(side="bottom", fill="x", padx=8, pady=(0,6))
-        ctk.CTkLabel(pal, text="Cor de destaque", font=ctk.CTkFont(size=10), text_color=cols["subtext"]).pack(anchor="w", padx=4, pady=2)
-        dots = ctk.CTkFrame(pal, fg_color="transparent"); dots.pack(fill="x", pady=2)
-        for aid, info in ACCENTS.items():
-            b = ctk.CTkButton(dots, text="", width=22, height=22, corner_radius=11, fg_color=info["color"], hover_color=info["hover"], command=lambda a=aid: self._quick_accent(a), border_width=2, border_color=cols["text"] if aid==self.theme_manager.current_accent else cols["sidebar"])
-            b.pack(side="left", padx=3)
+        ctk.CTkLabel(self.sidebar, text="© Guayanaz Systems", font=ctk.CTkFont(size=10), text_color=cols["subtext"]).pack(side="bottom", pady=10)
 
         # CONTENT - caixa principal arredondada (como feed do Spotify)
         self.content_wrap = ctk.CTkFrame(root, fg_color=cols["content"], corner_radius=8)
         self.content_wrap.grid(row=0,column=1, sticky="nsew")
         self.content_wrap.grid_columnconfigure(0, weight=1)
-        self.content_wrap.grid_rowconfigure(0, weight=1)
+        self.content_wrap.grid_rowconfigure(0, weight=0)
+        self.content_wrap.grid_rowconfigure(1, weight=1)
         # top bar inside content (estilo Spotify header com gradiente)
         self.topbar = ctk.CTkFrame(self.content_wrap, fg_color=cols["content"], corner_radius=8, height=56)
         self.topbar.grid(row=0,column=0, sticky="ew", padx=0, pady=0)
@@ -232,11 +226,9 @@ class ProPilotApp(ctk.CTk):
         self.top_title.pack(side="left", padx=20, pady=14)
         self.top_sub = ctk.CTkLabel(self.topbar, text="", font=ctk.CTkFont(size=12), text_color=cols["subtext"])
         self.top_sub.pack(side="left", padx=6, pady=14)
-        # actions topbar
+        # actions topbar - apenas tema
         self.theme_btn = ctk.CTkButton(self.topbar, text="🌙" if self.theme_manager.current_theme=="dark" else "☀️", width=36, height=32, corner_radius=16, fg_color=cols["card"], hover_color=cols["card_hover"], command=self._toggle_theme)
         self.theme_btn.pack(side="right", padx=12, pady=12)
-        self.accent_dot = ctk.CTkButton(self.topbar, text="", width=22, height=22, corner_radius=11, fg_color=acc, hover_color=self.theme_manager.get_accent_hover(), command=lambda: self._navigate_to("settings"))
-        self.accent_dot.pack(side="right", pady=12)
 
         # content frame (scrollable views entram aqui)
         self.content_frame = ctk.CTkFrame(self.content_wrap, fg_color="transparent")
@@ -247,13 +239,11 @@ class ProPilotApp(ctk.CTk):
         self._highlight_nav("dashboard")
 
     def _quick_accent(self, aid):
+        # mantido apenas para ser chamado pela aba Configurações
         self.theme_manager.set_accent(aid)
         acc = self.theme_manager.get_accent()
         self.side_progress.configure(progress_color=acc)
-        self.accent_dot.configure(fg_color=acc, hover_color=self.theme_manager.get_accent_hover())
-        # atualiza highlight
         self._highlight_nav(self._active_nav)
-        # se estiver em dashboard/settings, recarrega para aplicar cor
         if self._active_nav in ("dashboard","settings"):
             self._navigate_to(self._active_nav)
 
