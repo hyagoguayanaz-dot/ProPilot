@@ -47,9 +47,10 @@ class StudyCenterView(ctk.CTkFrame):
             ctk.CTkButton(h, text="← Voltar", width=90, height=28, command=self.on_back).grid(row=0,column=1, sticky="e")
         # search + filter
         filt = ctk.CTkFrame(self); filt.grid(row=1,column=0, sticky="ew", padx=8, pady=4); filt.grid_columnconfigure(0, weight=1)
+        self._search_job = None
         self.search = ctk.CTkEntry(filt, placeholder_text="Buscar manobra, categoria ou termo... ex: estol, pouso, navegacao")
         self.search.grid(row=0,column=0, sticky="ew", padx=8, pady=8)
-        self.search.bind("<KeyRelease>", lambda e: self._refresh())
+        self.search.bind("<KeyRelease>", self._on_search_debounced)
         cats = ctk.CTkFrame(filt, fg_color="transparent"); cats.grid(row=0,column=1, padx=6)
         for c in ["Todos","Basico","Navegacao"]:
             ctk.CTkButton(cats, text=c, width=76, height=28, command=lambda cc=c: self._set_cat(cc)).pack(side="left", padx=2)
@@ -70,6 +71,14 @@ class StudyCenterView(ctk.CTkFrame):
         if self._cat=="navegacao": self._cat="navigation"
         if self._cat=="basico": self._cat="basic"
         self._refresh()
+
+    def _on_search_debounced(self, event=None):
+        if hasattr(self, '_search_job') and self._search_job:
+            try: self.after_cancel(self._search_job)
+            except: pass
+        target = getattr(self, '_refresh', None) or getattr(self, '_refresh_list', None)
+        if target:
+            self._search_job = self.after(180, target)
 
     def _refresh(self):
         term = (self.search.get() or "").strip().lower()

@@ -67,9 +67,10 @@ class ManualsView(ctk.CTkFrame):
             ctk.CTkButton(h, text="← Voltar", width=90, height=28, command=self.on_back).grid(row=0,column=1,rowspan=2, sticky="e", padx=6)
         # search
         s = ctk.CTkFrame(self); s.grid(row=1,column=0, sticky="ew", padx=8, pady=4); s.grid_columnconfigure(0, weight=1)
+        self._search_job = None
         self.search = ctk.CTkEntry(s, placeholder_text="Buscar aeronave ou procedimento... ex: C172, fogo, Vne")
         self.search.pack(fill="x", padx=8, pady=8)
-        self.search.bind("<KeyRelease>", lambda e: self._refresh_list())
+        self.search.bind("<KeyRelease>", self._on_search_debounced)
         # body
         body = ctk.CTkFrame(self, fg_color="transparent")
         body.grid(row=2,column=0, sticky="nsew", padx=8, pady=(4,8))
@@ -82,6 +83,14 @@ class ManualsView(ctk.CTkFrame):
         # right
         self.right = ctk.CTkScrollableFrame(body, label_text="Selecione uma aeronave")
         self.right.grid(row=0,column=1, sticky="nsew", padx=(4,0))
+
+    def _on_search_debounced(self, event=None):
+        if hasattr(self, '_search_job') and self._search_job:
+            try: self.after_cancel(self._search_job)
+            except: pass
+        target = getattr(self, '_refresh', None) or getattr(self, '_refresh_list', None)
+        if target:
+            self._search_job = self.after(180, target)
 
     def _refresh_list(self):
         term = (self.search.get() or "").strip().lower()

@@ -247,6 +247,7 @@ class MissionsView(ctk.CTkFrame):
         self.missions_data = {}
         self.sop_data = {}
         self._selected_id = None
+        self._search_job = None
         # load data once
         try:
             p = resource_path(os.path.join("data","missions.json"))
@@ -331,6 +332,12 @@ class MissionsView(ctk.CTkFrame):
         self._level_popup = popup
         return 'break'
 
+    def _on_search_debounced(self, event=None):
+        if hasattr(self, '_search_job') and self._search_job:
+            try: self.after_cancel(self._search_job)
+            except: pass
+        self._search_job = self.after(180, lambda: self._refresh())
+
     def _build(self):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(2, weight=1)
@@ -345,7 +352,7 @@ class MissionsView(ctk.CTkFrame):
         s = ctk.CTkFrame(self); s.grid(row=1,column=0, sticky="ew", padx=8, pady=4); s.grid_columnconfigure(0, weight=1)
         self.search = ctk.CTkEntry(s, placeholder_text="Buscar missao... ex: PS-3, navegacao, pouso")
         self.search.pack(fill="x", padx=8, pady=8)
-        self.search.bind("<KeyRelease>", lambda e: self._refresh())
+        self.search.bind("<KeyRelease>", self._on_search_debounced)
 
         # split: left list | right detail
         body = ctk.CTkFrame(self, fg_color="transparent")
@@ -364,6 +371,8 @@ class MissionsView(ctk.CTkFrame):
         self._refresh()
 
     def _refresh(self):
+        # cache progresso (evita I/O repetido)
+        self._cached_progress = self.db.load_progress()
         term = (self.search.get() or "").strip().lower()
         for w in self.left_scroll.winfo_children():
             w.destroy()
@@ -392,7 +401,7 @@ class MissionsView(ctk.CTkFrame):
             ctk.CTkLabel(self.left_scroll, text="Nenhuma missao encontrada.", text_color=("gray50","gray60")).pack(pady=20)
 
     def _card(self, m: Dict, phase: str):
-        done = m["id"] in self.db.load_progress().get("completed_missions",[])
+        done = m["id"] in self._cached_progress.get("completed_missions",[])
         is_sel = self._selected_id == m["id"]
         card = ctk.CTkFrame(self.left_scroll, corner_radius=10, border_width=2 if is_sel else 1, border_color="#4cc2ff" if is_sel else ("gray75","gray30"))
         card.pack(fill="x", padx=6, pady=5)
@@ -464,6 +473,9 @@ class MissionsView(ctk.CTkFrame):
             arrow = "▼" if is_open else "▶"
             lbl = ctk.CTkLabel(row, text=f"{arrow}  {idx:02d}. {name}", font=ctk.CTkFont(size=12), anchor="w", justify="left", wraplength=300)
             lbl.grid(row=0, column=0, sticky="w", padx=6, pady=6)
+            if i % 8 == 0:
+                try: self.update_idletasks()
+                except: pass
             badge = ctk.CTkLabel(row, text=level, width=36, height=22, corner_radius=8, fg_color=LEVEL_COLORS.get(level, "#444"), text_color="white", font=ctk.CTkFont(weight="bold", size=11))
             badge.grid(row=0, column=1, padx=6)
             full = LEVEL_LABELS.get(level, level)

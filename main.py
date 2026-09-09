@@ -9,19 +9,27 @@ from pathlib import Path
 
 __version__ = "2.0.0"
 
-try:
-    from views.missions_view import MissionsView
-    from views.study_center_view import StudyCenterView
-    from views.settings_view import SettingsView
-    from views.manuals_view import ManualsView
-    from views.sop_view import SOPView
-except ImportError:
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from views.missions_view import MissionsView
-    from views.study_center_view import StudyCenterView
-    from views.settings_view import SettingsView
-    from views.manuals_view import ManualsView
-    from views.sop_view import SOPView
+# Views com lazy import para fluidez no startup
+MissionsView = StudyCenterView = SettingsView = ManualsView = SOPView = None
+def _lazy_import_views():
+    global MissionsView, StudyCenterView, SettingsView, ManualsView, SOPView
+    if MissionsView is None:
+        try:
+            from views.missions_view import MissionsView as _M
+            from views.study_center_view import StudyCenterView as _S
+            from views.settings_view import SettingsView as _Se
+            from views.manuals_view import ManualsView as _Ma
+            from views.sop_view import SOPView as _So
+        except ImportError:
+            import os
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from views.missions_view import MissionsView as _M
+            from views.study_center_view import StudyCenterView as _S
+            from views.settings_view import SettingsView as _Se
+            from views.manuals_view import ManualsView as _Ma
+            from views.sop_view import SOPView as _So
+        MissionsView, StudyCenterView, SettingsView, ManualsView, SOPView = _M, _S, _Se, _Ma, _So
+    return MissionsView, StudyCenterView, SettingsView, ManualsView, SOPView
 
 try:
     from database import get_database
@@ -123,7 +131,7 @@ class ProPilotApp(ctk.CTk):
         self._configure_window()
         self.theme_manager.apply(self)
         self._setup_ui()
-        self.show_dashboard()
+        self.after(10, self.show_dashboard)  # after_idle para fluidez no startup
 
     def _configure_window(self):
         self.title("Pro Pilot")
@@ -316,17 +324,21 @@ class ProPilotApp(ctk.CTk):
     def show_dashboard(self):
         self._clear(); self._render_dashboard(); self._update_phase()
     def show_missions(self):
-        self._clear(); MissionsView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8); self._update_phase()
+        self._clear(); _lazy_import_views()[0](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8); self._update_phase()
     def show_study_center(self):
-        self._clear(); StudyCenterView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._clear(); _lazy_import_views()[1](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
     def show_manuals(self):
-        self._clear(); ManualsView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._clear(); _lazy_import_views()[3](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
     def show_sop(self):
-        self._clear(); SOPView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._clear(); _lazy_import_views()[4](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
     def show_settings(self):
-        self._clear(); SettingsView(self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
+        self._clear(); _lazy_import_views()[2](self.content_frame, on_back=self.show_dashboard, theme_manager=self.theme_manager).grid(row=0,column=0,sticky="nsew", padx=8, pady=8)
     def _clear(self):
         for w in self.content_frame.winfo_children(): w.destroy()
+        try:
+            import gc
+            gc.collect()
+        except: pass
 
     def _render_dashboard(self):
         cols = self.theme_manager.get_colors()

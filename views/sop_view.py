@@ -67,9 +67,10 @@ class SOPView(ctk.CTkFrame):
         # search
         s = ctk.CTkFrame(self, fg_color=cols["card"], corner_radius=8)
         s.grid(row=1,column=0, sticky="ew", padx=8, pady=4); s.grid_columnconfigure(0, weight=1)
+        self._search_job = None
         self.search = ctk.CTkEntry(s, placeholder_text="Buscar no SOP... ex: decolagem, estol, pane, cheque", fg_color=cols["hover"], border_color=cols["line"], text_color=cols["text"])
         self.search.pack(fill="x", padx=10, pady=10)
-        self.search.bind("<KeyRelease>", lambda e: self._refresh_list())
+        self.search.bind("<KeyRelease>", self._on_search_debounced)
         # body
         body = ctk.CTkFrame(self, fg_color="transparent")
         body.grid(row=2,column=0, sticky="nsew", padx=8, pady=(4,8))
@@ -80,6 +81,14 @@ class SOPView(ctk.CTkFrame):
         self.left.grid(row=0,column=0, sticky="nsew", padx=(0,4))
         self.right = ctk.CTkScrollableFrame(body, label_text="Selecione uma seção", fg_color=cols["card"])
         self.right.grid(row=0,column=1, sticky="nsew", padx=(4,0))
+
+    def _on_search_debounced(self, event=None):
+        if hasattr(self, '_search_job') and self._search_job:
+            try: self.after_cancel(self._search_job)
+            except: pass
+        target = getattr(self, '_refresh', None) or getattr(self, '_refresh_list', None)
+        if target:
+            self._search_job = self.after(180, target)
 
     def _refresh_list(self):
         term = (self.search.get() or "").strip().lower()
