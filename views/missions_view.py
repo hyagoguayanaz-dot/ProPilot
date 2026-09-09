@@ -282,17 +282,13 @@ class MissionsView(ctk.CTkFrame):
         if not getattr(self, "sop_data", None):
             return ""
         n = ex_name.lower()
-    # tenta match exato ou parcial
         for key, txt in self.sop_data.items():
             if key in n or n in key:
-                # limita tamanho
                 t = txt.strip()
                 if len(t) > 600:
                     t = t[:580] + "…"
                 return t
-    # fallback por palavra-chave
         for key, txt in self.sop_data.items():
-            # primeira palavra
             first = key.split()[0] if key.split() else ""
             if first and first in n:
                 t = txt.strip()
@@ -300,6 +296,40 @@ class MissionsView(ctk.CTkFrame):
                     t = t[:580] + "…"
                 return t
         return ""
+
+    def _show_level_popup(self, level: str, anchor_widget):
+        if hasattr(self, '_level_popup') and self._level_popup and self._level_popup.winfo_exists():
+            try: self._level_popup.destroy()
+            except: pass
+        lvl_key = level.strip() if level.strip() in LEVEL_OFICIAL else level.strip().upper()
+        title, desc = LEVEL_OFICIAL.get(lvl_key, (f"{level} — Nível exigido", "Executar conforme quadro de missões."))
+        try:
+            popup = __import__('customtkinter').CTkToplevel(self)
+        except:
+            popup = __import__('tkinter').Toplevel(self)
+        popup.title(f"Nível {level}")
+        popup.geometry('380x220')
+        popup.resizable(False, False)
+        popup.transient(self)
+        popup.attributes('-topmost', True)
+        try:
+            x = anchor_widget.winfo_rootx() + 20
+            y = anchor_widget.winfo_rooty() + 30
+            popup.geometry(f'+{x}+{y}')
+        except: pass
+        bg = '#fef9e7' if (self.theme_manager and self.theme_manager.current_theme=='light') else '#1e1a0a'
+        import customtkinter as ctk
+        frame = ctk.CTkFrame(popup, fg_color=bg, corner_radius=10, border_width=1, border_color='#f0c040')
+        frame.pack(fill='both', expand=True, padx=10, pady=10)
+        ctk.CTkLabel(frame, text=title, font=ctk.CTkFont(size=13, weight='bold'), text_color='#1f538d').pack(anchor='w', padx=12, pady=(10,4))
+        ctk.CTkLabel(frame, text=desc, wraplength=340, justify='left', font=ctk.CTkFont(size=11), anchor='w').pack(anchor='w', padx=12, pady=(0,6))
+        ctk.CTkLabel(frame, text='Ficha: grau ≥3 para aprovação; grau 1 (Perigoso) ou 2 (Deficiente) reprova.', wraplength=340, justify='left', font=ctk.CTkFont(size=10, slant='italic'), text_color='gray50').pack(anchor='w', padx=12, pady=(0,8))
+        ctk.CTkButton(frame, text='Fechar', width=80, height=28, corner_radius=14, command=popup.destroy).pack(pady=(0,8))
+        popup.grab_set()
+        popup.focus_set()
+        popup.after(8000, lambda: popup.destroy() if popup.winfo_exists() else None)
+        self._level_popup = popup
+        return 'break'
 
     def _build(self):
         self.grid_columnconfigure(0, weight=1)
@@ -438,12 +468,10 @@ class MissionsView(ctk.CTkFrame):
             badge.grid(row=0, column=1, padx=6)
             full = LEVEL_LABELS.get(level, level)
             ctk.CTkLabel(row, text=full, font=ctk.CTkFont(size=10), text_color=("gray45","gray60")).grid(row=0, column=2, padx=(0,6))
-            ctk.CTkLabel(row, text="clique para dicas", font=ctk.CTkFont(size=9), text_color=("#1f538d","#4cc2ff")).grid(row=0, column=3, padx=4)
+            ctk.CTkLabel(row, text="nível clicável", font=ctk.CTkFont(size=9), text_color=("#1f538d","#4cc2ff")).grid(row=0, column=3, padx=4)
             detail = ctk.CTkFrame(outer, fg_color=("#fef9e7","#1e1a0a"), corner_radius=6, border_width=1, border_color=("#f0c040","#8a6d00"))
             if is_open:
                 detail.grid(row=1, column=0, sticky="ew", padx=6, pady=(0,6))
-                ctk.CTkLabel(detail, text="📋 O que é cobrado (documento oficial):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#1f538d", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
-                ctk.CTkLabel(detail, text=f"• {_official_charge(name, level, m['id'])}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,6))
                 sop_txt = self._sop_for(name)
                 if sop_txt:
                     ctk.CTkLabel(detail, text="📖 Procedimento SOP (ACP 2023 – P-56C Paulistinha):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#8e44ad", anchor="w").pack(anchor="w", padx=10, pady=(6,2))
@@ -460,8 +488,6 @@ class MissionsView(ctk.CTkFrame):
                     if self._ex_expanded[k]:
                         d.grid(row=1, column=0, sticky="ew", padx=6, pady=(0,6))
                         if not d.winfo_children():
-                            ctk.CTkLabel(d, text="📋 O que é cobrado (documento oficial):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#1f538d", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
-                            ctk.CTkLabel(d, text=f"• {_official_charge(ex_name, level, m['id'])}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,6))
                             sop2 = self._sop_for(ex_name)
                             if sop2:
                                 ctk.CTkLabel(d, text="📖 Procedimento SOP (ACP 2023 – P-56C Paulistinha):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#8e44ad", anchor="w").pack(anchor="w", padx=10, pady=(6,2))
@@ -477,10 +503,14 @@ class MissionsView(ctk.CTkFrame):
                         ll.configure(text=f"▶  {ii:02d}. {ex_name}")
                 return toggle
             tog = make_toggle()
-            for w in (row, lbl, badge, outer):
+            for w in (row, lbl, outer):
                 w.bind("<Button-1>", tog)
                 try: w.configure(cursor="hand2")
                 except: pass
+            # badge mostra popup do nível (não expande)
+            badge.bind("<Button-1>", lambda e, lvl=level, w=badge: self._show_level_popup(lvl, w))
+            try: badge.configure(cursor="hand2")
+            except: pass
         # criterios
         crit = ctk.CTkFrame(self.right_scroll, fg_color=("#fff7cc","#2a2410"), border_width=1, border_color="#f1c40f"); crit.pack(fill="x", padx=6, pady=8)
         ctk.CTkLabel(crit, text="Criterios de aprovacao", font=ctk.CTkFont(weight="bold")).pack(anchor="w", padx=10, pady=(8,2))
