@@ -250,7 +250,6 @@ class ProPilotApp(ctk.CTk):
     def _toggle_theme(self):
         new = "light" if self.theme_manager.current_theme=="dark" else "dark"
         self.theme_manager.set_theme(new)
-        # recria UI simples: troca cores
         cols = self.theme_manager.get_colors()
         acc = self.theme_manager.get_accent()
         self.configure(fg_color=cols["bg"])
@@ -258,10 +257,35 @@ class ProPilotApp(ctk.CTk):
         self.content_wrap.configure(fg_color=cols["content"])
         self.topbar.configure(fg_color=cols["content"])
         self.side_card.configure(fg_color=cols["card"])
-        self.theme_btn.configure(text="☀️" if new=="light" else "🌙", fg_color=cols["card"], hover_color=cols["card_hover"])
-        # re-highlight nav com novas cores
+        # atualiza textos da sidebar e topbar para não ficarem brancos no modo claro
+        try:
+            # sidebar texts
+            for w in self.sidebar.winfo_children():
+                if isinstance(w, ctk.CTkLabel):
+                    # PILOTO PRIVADO e copyright
+                    w.configure(text_color=cols["subtext"])
+            # side_card labels
+            for w in self.side_card.winfo_children():
+                if isinstance(w, ctk.CTkLabel):
+                    txt = str(w.cget("text"))
+                    if "Sua fase" in txt or "missões" in txt:
+                        w.configure(text_color=cols["subtext"])
+                    else:
+                        w.configure(text_color=cols["text"])
+            self.side_progress.configure(progress_color=acc, fg_color=cols["line"])
+        except: pass
+        self.theme_btn.configure(text="☀️" if new=="light" else "🌙", fg_color=cols["card"], hover_color=cols["card_hover"], text_color=cols["text"])
+        self.top_title.configure(text_color=cols["text"])
+        self.top_sub.configure(text_color=cols["subtext"])
         self._highlight_nav(self._active_nav)
         self._update_phase()
+        # recarrega view atual para recriar cards com cores corretas (evita itens brancos)
+        try:
+            cur = self._active_nav
+            # evita loop se já estiver reconstruindo settings (que já se reconstrói sozinho)
+            if cur != "settings":
+                self._navigate_to(cur)
+        except: pass
 
     def _highlight_nav(self, active):
         cols = self.theme_manager.get_colors()

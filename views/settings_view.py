@@ -64,7 +64,7 @@ class SettingsView(ctk.CTkFrame):
         pal_sec = ctk.CTkFrame(scroll, fg_color=cols["card"], corner_radius=12)
         pal_sec.grid(row=1,column=0, sticky="ew", padx=10, pady=8); pal_sec.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(pal_sec, text="Cor de destaque", font=ctk.CTkFont(size=14, weight="bold"), text_color=cols["text"]).pack(anchor="w", padx=16, pady=(14,2))
-        ctk.CTkLabel(pal_sec, text="Escolha uma cor — aplicada em botões, barras e destaques (estilo Spotify)", font=ctk.CTkFont(size=11), text_color=cols["sub"], wraplength=500, justify="left").pack(anchor="w", padx=16, pady=(0,8))
+        ctk.CTkLabel(pal_sec, text="Escolha uma cor — aplicada em botões, barras e destaques", font=ctk.CTkFont(size=11), text_color=cols["sub"], wraplength=500, justify="left").pack(anchor="w", padx=16, pady=(0,8))
         grid = ctk.CTkFrame(pal_sec, fg_color="transparent")
         grid.pack(fill="x", padx=12, pady=6)
         grid.grid_columnconfigure((0,1,2,3), weight=1)
