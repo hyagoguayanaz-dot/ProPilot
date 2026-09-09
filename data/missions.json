@@ -1,0 +1,656 @@
+{
+  "info": {
+    "title": "PROGRAMA DE INSTRUÇÃO - CURSO DE PILOTO PRIVADO AVIÃO",
+    "curso": "PPA PPAP 001",
+    "data": "20 de MAIO de 2021",
+    "anexo": "PI (5755494)",
+    "sei": "00065.020890/2021-54",
+    "instituicao": "Aeroclube de Pirassununga",
+    "carga_horaria_total": "3h teórica + 43h voo",
+    "fases": {
+      "PS": "Pré-Solo - 20 horas mínimas",
+      "AP": "Aperfeiçoamento - 10 horas mínimas",
+      "NV": "Navegação - 10 horas mínimas",
+      "NOT": "Noturno - 3 horas mínimas"
+    },
+    "avaliacao": {
+      "grau_minimo_aprovacao": 3,
+      "definicoes_graus": {
+        "1": "Perigoso",
+        "2": "Deficiente",
+        "3": "Satisfatório",
+        "4": "Bom",
+        "5": "Excelente"
+      }
+    }
+  },
+  "missions": {
+    "PS": {
+      "name": "Pré-Solo",
+      "description": "Fase inicial de instrução - 20 horas mínimas de voo. O aluno só poderá realizar voo solo se tiver obtido aprovação nos exames teóricos e com o endossso requerido (IS 61-006).",
+      "total_hours": 20,
+      "type": "DC",
+      "missions": [
+        {
+          "id": "PS-1",
+          "name": "Missão PS-1",
+          "number": 1,
+          "duration": "01:00",
+          "type": "DC",
+          "description": "Familiarização com a aeronave (ground school)",
+          "exercises": [
+            "Livro de bordo / equip. de voo"
+          ],
+          "level": "E",
+          "required_level": "E"
+        },
+        {
+          "id": "PS-2",
+          "name": "Missão PS-2",
+          "number": 2,
+          "duration": "01:00",
+          "type": "DC",
+          "description": "Ambientação na aeronave",
+          "exercises": [
+            "Ambientação na aeronave",
+            "Procedimentos normais",
+            "Procedimentos de emergência"
+          ],
+          "level": "E A A",
+          "required_level": "E"
+        },
+        {
+          "id": "PS-3",
+          "name": "Missão PS-3",
+          "number": 3,
+          "duration": "01:00",
+          "type": "DC",
+          "description": "Missão de iniciação básica",
+          "exercises": [
+            "Livro de bordo / equip. de voo",
+            "Inspeções",
+            "Partida do motor",
+            "Fraseologia",
+            "Rolagem (taxiamento)",
+            "Decolagem normal",
+            "Saída do tráfego",
+            "Subida para a área de instrução",
+            "Nivelamento",
+            "Identificação da área",
+            "Uso dos comandos",
+            "Uso do motor",
+            "Uso do compensador",
+            "Retas e curvas subindo",
+            "Retas e curvas descendo",
+            "Voo nivelado",
+            "Orientação por referências no solo",
+            "Curvas de pequena inclinação",
+            "Curvas de média inclinação",
+            "Voo em retângulo",
+            "Estol sem motor"
+          ],
+          "level": "M",
+          "required_level": "M"
+        },
+        {
+          "id": "PS-4",
+          "name": "Missão PS-4",
+          "number": 4,
+          "duration": "01:00",
+          "type": "DC",
+          "description": "Continuação da fase inicial",
+          "exercises": [
+            "Livro de bordo / equip. de voo",
+            "Inspeções",
+            "Partida do motor",
+            "Fraseologia",
+            "Rolagem",
+            "Decolagem normal",
+            "Saída do tráfego",
+            "Subida",
+            "Nivelamento",
+            "Identificação da área",
+            "Uso dos comandos",
+            "Uso do motor",
+            "Uso do compensador",
+            "Retas e curvas subindo e descendo",
+            "Voo nivelado",
+            "Orientação no solo",
+            "Curvas de pequena e média inclinação",
+            "Descida e entrada no tráfego",
+            "Circuito de tráfego",
+            "Enquadramento da pista",
+            "Aproximação final",
+            "Pouso normal",
+            "Manutenção da Reta após o pouso",
+            "Procedimentos após o pouso",
+            "Estacionamento da aeronave",
+            "Parada do motor",
+            "Cheque de abandono"
+          ],
+          "level": "C",
+          "required_level": "C"
+        }
+      ]
+    },
+    "AP": {
+      "name": "Aperfeiçoamento",
+      "description": "Fase de aprimoramento - 10 horas mínimas de voo. Os voos solo serão realizados com os endossos requeridos (IS 61-006).",
+      "total_hours": 10,
+      "type": "DC",
+      "missions": [
+        {
+          "id": "AP-1",
+          "name": "Missão AP-1",
+          "number": 1,
+          "duration": "01:00",
+          "type": "DC",
+          "description": "Decolagem e treinamento avançado",
+          "exercises": [
+            "Livro de bordo / equip. de voo",
+            "Inspeções",
+            "Partida do motor",
+            "Fraseologia",
+            "Rolagem",
+            "Decolagem normal",
+            "Decolagem curta",
+            "Decolagem com obstáculo",
+            "Pane simulada a baixa altura",
+            "Circuito de tráfego",
+            "Arremetida na final",
+            "Pouso normal",
+            "Pouso curto",
+            "Pouso de pista",
+            "Arremetida no solo",
+            "Corrida após pouso",
+            "Parada do motor",
+            "Cheque de abandono"
+          ],
+          "level": "X",
+          "required_level": "X"
+        }
+      ]
+    },
+    "NV": {
+      "name": "Navegação",
+      "description": "Fase de navegação - 10 horas mínimas de voo. Os voos solo serão realizados com os endossos requeridos (IS 61-006).",
+      "total_hours": 10,
+      "type": "DC",
+      "missions": [
+        {
+          "id": "NV-1",
+          "name": "Missão NV-1",
+          "number": 1,
+          "duration": "01:30",
+          "type": "DC",
+          "description": "Introdução à navegação",
+          "exercises": [
+            "Documentação da aeronave",
+            "Planejamento do voo",
+            "Consulta à meteorologia",
+            "Regras de tráfego aéreo",
+            "Livro de bordo / equip. de voo",
+            "Inspeções",
+            "Partida do motor",
+            "Fraseologia",
+            "Taxiamento",
+            "Decolagem",
+            "Saída do tráfego",
+            "Subida (de acordo com os órgãos de controle)",
+            "Nivelamento",
+            "Estabelecimento do regime de cruzeiro",
+            "Voo de cruzeiro",
+            "Manutenção de proas e rumos",
+            "Voo em rota",
+            "Navegação estimada",
+            "Navegação por contato",
+            "Início da descida",
+            "Descida em rota",
+            "Entrada no tráfego",
+            "Circuito de tráfego",
+            "Pouso",
+            "Procedimentos após o(s) pouso(s)",
+            "Procedimentos de estacionamento",
+            "Parada do motor",
+            "Reabastecimento",
+            "Procedimentos para pernoite da aeronave",
+            "Cheque de abandono"
+          ],
+          "level": "A",
+          "required_level": "A"
+        }
+      ]
+    },
+    "NOT": {
+      "name": "Noturno",
+      "description": "Fase noturna - 3 horas mínimas de voo.",
+      "total_hours": 3,
+      "type": "DC",
+      "missions": [
+        {
+          "id": "NOT-1",
+          "name": "Missão NOT-1",
+          "number": 1,
+          "duration": "01:30",
+          "type": "DC",
+          "description": "Operação noturna básica",
+          "exercises": [
+            "Livro de bordo / equip. de voo",
+            "Inspeções",
+            "Partida do motor",
+            "Cheques",
+            "Fraseologia",
+            "Rolagem (taxiamento)",
+            "Decolagem normal",
+            "Circuito de tráfego",
+            "Arremetida na final",
+            "Pouso normal",
+            "Arremetida no solo",
+            "Corrida após pouso",
+            "Parada do motor",
+            "Cheque de abandono"
+          ],
+          "level": "A E",
+          "required_level": "A"
+        }
+      ]
+    }
+  },
+  "requirements": {
+    "ps-1": {
+      "Livro de bordo / equip. de voo": "E"
+    },
+    "ps-2": {
+      "Ambientação na aeronave": "E",
+      "Procedimentos normais": "A",
+      "Procedimentos de emergência": "A"
+    },
+    "ps-3": {
+      "Livro de bordo / equip. de voo": "M",
+      "Inspeções": "M",
+      "Partida do motor": "M",
+      "Fraseologia": "M",
+      "Rolagem (taxiamento)": "M",
+      "Decolagem normal": "M",
+      "Saída do tráfego": "M",
+      "Subida para a área de instrução": "M",
+      "Nivelamento": "M",
+      "Identificação da área": "M",
+      "Uso dos comandos": "M",
+      "Uso do motor": "M",
+      "Uso do compensador": "M",
+      "Retas e curvas subindo": "M",
+      "Retas e curvas descendo": "M",
+      "Voo nivelado": "M",
+      "Orientação por referências no solo": "M",
+      "Curvas de pequena inclinação": "M",
+      "Curvas de média inclinação": "M",
+      "Voo em retângulo": "M",
+      "Estol sem motor": "M"
+    },
+    "ps-4": {
+      "Livro de bordo / equip. de voo": "C",
+      "Inspeções": "C",
+      "Partida do motor": "C",
+      "Fraseologia": "C",
+      "Rolagem": "C",
+      "Decolagem normal": "C",
+      "Saída do tráfego": "C",
+      "Subida": "C",
+      "Nivelamento": "C",
+      "Identificação da área": "C",
+      "Uso dos comandos": "C",
+      "Uso do motor": "C",
+      "Uso do compensador": "C",
+      "Retas e curvas subindo e descendo": "C",
+      "Voo nivelado": "C",
+      "Orientação no solo": "C",
+      "Curvas de pequena e média inclinação": "C",
+      "Descida e entrada no tráfego": "C",
+      "Circuito de tráfego": "C",
+      "Enquadramento da pista": "C",
+      "Aproximação final": "C",
+      "Pouso normal": "C",
+      "Manutenção da Reta após o pouso": "C",
+      "Procedimentos após o pouso": "C",
+      "Estacionamento da aeronave": "C",
+      "Parada do motor": "C",
+      "Cheque de abandono": "C"
+    },
+    "ap-1": {
+      "Livro de bordo / equip. de voo": "X",
+      "Inspeções": "X",
+      "Partida do motor": "X",
+      "Fraseologia": "X",
+      "Rolagem": "X",
+      "Decolagem normal": "X",
+      "Decolagem curta": "X",
+      "Decolagem com obstáculo": "X",
+      "Pane simulada a baixa altura": "X",
+      "Circuito de tráfego": "X",
+      "Arremetida na final": "X",
+      "Pouso normal": "X",
+      "Pouso curto": "X",
+      "Pouso de pista": "X",
+      "Arremetida no solo": "X",
+      "Corrida após pouso": "X",
+      "Parada do motor": "X",
+      "Cheque de abandono": "X"
+    },
+    "nv-1": {
+      "Documentação da aeronave": "A",
+      "Planejamento do voo": "A",
+      "Consulta à meteorologia": "A",
+      "Regras de tráfego aéreo": "A",
+      "Livro de bordo / equip. de voo": "A",
+      "Inspeções": "A",
+      "Partida do motor": "A",
+      "Fraseologia": "A",
+      "Taxiamento": "A",
+      "Decolagem": "A",
+      "Saída do tráfego": "A",
+      "Subida (de acordo com os órgãos de controle)": "A",
+      "Nivelamento": "A",
+      "Estabelecimento do regime de cruzeiro": "A",
+      "Voo de cruzeiro": "A",
+      "Manutenção de proas e rumos": "A",
+      "Voo em rota": "A",
+      "Navegação estimada": "A",
+      "Navegação por contato": "A",
+      "Início da descida": "A",
+      "Descida em rota": "A",
+      "Entrada no tráfego": "A",
+      "Circuito de tráfego": "A",
+      "Pouso": "A",
+      "Procedimentos após o(s) pouso(s)": "A",
+      "Procedimentos de estacionamento": "A",
+      "Parada do motor": "A",
+      "Reabastecimento": "A",
+      "Procedimentos para pernoite da aeronave": "A",
+      "Cheque de abandono": "A"
+    },
+    "not-1": {
+      "Livro de bordo / equip. de voo": "E",
+      "Inspeções": "E",
+      "Partida do motor": "E",
+      "Cheques": "E",
+      "Fraseologia": "E",
+      "Rolagem (taxiamento)": "E",
+      "Decolagem normal": "E",
+      "Circuito de tráfego": "E",
+      "Arremetida na final": "E",
+      "Pouso normal": "E",
+      "Arremetida no solo": "E",
+      "Corrida após pouso": "E",
+      "Parada do motor": "E",
+      "Cheque de abandono": "E"
+    }
+  },
+  "maneuvers": {
+    "basic": [
+      {
+        "id": "MAN-01",
+        "name": "Familiarização com a aeronave",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Ensino sobre os componentes e sistemas da aeronave Cessna 172/P-56C",
+        "steps": [
+          "Identificação dos instrumentos de piloto e copiloto",
+          "Verificação do painel e controles",
+          "Conhecimento dos botões e interruptores principais",
+          "Identificação de painéis de controle"
+        ],
+        "prerequisites": "Leitura do Manual do Piloto e do Manual da aeronave",
+        "common_errors": "Confusão entre painéis, desconhecimento da localização dos interruptores"
+      },
+      {
+        "id": "MAN-02",
+        "name": "Procedimentos normais",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Execução padrão de todas as operações da aeronave",
+        "steps": [
+          "Follow checklist de pré-voo",
+          "Executar procedimentos de inicialização",
+          "Verificar sistemas enquanto o motor é ligado",
+          "Confirmar posição dos interruptores"
+        ],
+        "prerequisites": "Domínio de checklist, familiaridade com aeronave",
+        "common_errors": "Pular etapas do checklist, não verificar sistemas críticos"
+      },
+      {
+        "id": "MAN-03",
+        "name": "Procedimentos de emergência",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Técnicas para lidar com situações anormais e críticas",
+        "steps": [
+          "Identificar a anomalia imediatamente",
+          "Seguir checklist específico",
+          "Comunicar ao instrutor/piloto",
+          "Executar ação corretiva",
+          "Verificar normalização das condições"
+        ],
+        "prerequisites": "Domínio do checklist de emergência",
+        "common_errors": "Reação lenta, escolha de ação incorreta"
+      },
+      {
+        "id": "MAN-04",
+        "name": "Decolagem normal",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Procedimento padrão para decolagem em pista nivelada",
+        "steps": [
+          "Briefing da pista e condições",
+          "Cheques pré-partida completos",
+          "Alinhamento na pista com limite aceitável de desvios laterais",
+          "Aceleração no mínimo necessário",
+          "Liberação de freio",
+          "Elevação da aeronave com 50-75kt de velocidade",
+          "Manobras de saída do tráfego conforme procedimento"
+        ],
+        "prerequisites": "Domínio de procedimentos de taxi e partida do motor",
+        "common_errors": "Aceleração excessiva, saída do tráfego precoce, velocidade insuficiente"
+      },
+      {
+        "id": "MAN-05",
+        "name": "Pouso normal",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Procedimento padrão para pouso em pista nivelada",
+        "steps": [
+          "Establishar altitude de descida apropriada (300-500ft sobre o solo)",
+          "Reduzir proa para velocidade de chegada a 70-80kt",
+          "Manter correta linha de destino com 50ft da pista",
+          "Aumentar compensação no final",
+          "Flare a 10-15ft do solo com 60-70kt",
+          "Aterrisagem suave com pouca elevação",
+          "Manter corrente após toque"
+        ],
+        "prerequisites": "Domínio de descida de cruzeiro e estabilização de velocidade",
+        "common_errors": "Flare excessivo, velocidade de pouso insuficiente, linha desviada"
+      },
+      {
+        "id": "MAN-06",
+        "name": "Circuito de tráfego",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Procedimento padronizado para operação em aproximação a aeroporto",
+        "steps": [
+          "Entrada no circuito conforme diretriz local",
+          "Manter altitude e velocidade apropriadas",
+          "Comunicação contínua com pista",
+          "Aprimoramento de circuitos",
+          "Entrada na final em condições seguras"
+        ],
+        "prerequisites": "Conhecimento de regras de tráfego aéreo e comunicação",
+        "common_errors": "Altitude errada, perda de comunicação, entrada precoce no circuito"
+      },
+      {
+        "id": "MAN-07",
+        "name": "Arremetida normal",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Manobra de saída de pista após pouso",
+        "steps": [
+          "Pouso normal com corrente",
+          "Parar motor imediatamente",
+          "Ativar direção de arremetida (50°)",
+          "Manter curso com corrente",
+          "Flare suave e aterrisagem em final curta"
+        ],
+        "prerequisites": "Pouso normal em final longa",
+        "common_errors": "Ângulo de arremetida incorreto, excesso de throttle"
+      },
+      {
+        "id": "MAN-08",
+        "name": "Estol simulado",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Demonstração do ponto de estol da aeronave",
+        "steps": [
+          "Manobrar arremetida com proa alta e compensação baixa",
+          "Manter rota com freio",
+          "Identificar limite de velocidade de estol",
+          "Retornar a normalidade antes do estol"
+        ],
+        "prerequisites": "Entendimento de limites de performance",
+        "common_errors": "Estol prematuro, manobras agressivas"
+      },
+      {
+        "id": "MAN-09",
+        "name": "Entrada no tráfego",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Procedimento para entrar em área de tráfego de aeroporto",
+        "steps": [
+          "Comunicar intenção de entrada",
+          "Obter autorização do controle",
+          "Seguir rota atribuída",
+          "Comunicar entrada efetiva"
+        ],
+        "prerequisites": "Conhecimento de regras de tráfego",
+        "common_errors": "Entrada sem autorização, comunicação inadequada"
+      },
+      {
+        "id": "MAN-10",
+        "name": "Manutenção de proas e rumos",
+        "category": "Navegação",
+        "phase": "Navegação",
+        "description": "Ferramentas para manter curso e altitude durante voo",
+        "steps": [
+          "Estabelecer proa e rumo corretos",
+          "Manter curso com pequenos ajustes de compensador",
+          "Verificar altitude com altímetro",
+          "Ajustar compensação conforme necessário"
+        ],
+        "prerequisites": "Uso do compasso e indicador de altitude",
+        "common_errors": "Grandes ajustes de compensador, não verificar drift"
+      },
+      {
+        "id": "MAN-11",
+        "name": "Navegação estimada",
+        "category": "Navegação",
+        "phase": "Navegação",
+        "description": "Uso de instrumentos para manter rota",
+        "steps": [
+          "Estabelecer rumo com compasso magnético",
+          "Acionar OBS/PROSPECTOR no radaresonanta",
+          "Manter latitude/longitude conforme plano",
+          "Verificar progresso contra cronograma"
+        ],
+        "prerequisites": "Domínio de instrumentos de navegação",
+        "common_errors": "Confusão de rumo magnético/verdadeiro, drift não corrigido"
+      },
+      {
+        "id": "MAN-12",
+        "name": "Cheque de abandono",
+        "category": "Básico",
+        "phase": "Pré-Solo",
+        "description": "Procedimentos para finalizar missão de voo",
+        "steps": [
+          "Desligar motores",
+          "Desconectar baterias",
+          "Fechar torneiras de combustível",
+          "Registrar dados no livro de bordo",
+          "Documentar condições da aeronave"
+        ],
+        "prerequisites": "Missão concluída com segurança",
+        "common_errors": "Omissão de verificação, documentação incompleta"
+      }
+    ],
+    "navigation": [
+      {
+        "id": "MAN-NV-01",
+        "name": "Planejamento do voo",
+        "category": "Navegação",
+        "phase": "Navegação",
+        "description": "Preparação de rota considerando condições de voo",
+        "steps": [
+          "Verificar METAR e NOTAM",
+          "Consultar charts de rota",
+          "Calcular tempo de voo e consumo de combustível",
+          "Identificar pontos de parada"
+        ],
+        "prerequisites": "Acesso a informações meteorológicas e cartas",
+        "common_errors": "Subestimar consumo, ignorar NOTAM críticos"
+      },
+      {
+        "id": "MAN-NV-02",
+        "name": "Subida",
+        "category": "Navegação",
+        "phase": "Navegação",
+        "description": "Procédimento para subida segura",
+        "steps": [
+          "Verificar altitudes mínimas",
+          "Manter proa adequada",
+          "Comunicar subida ao controle",
+          "Estabelecer cruzeiro"
+        ],
+        "prerequisites": "Domínio de procedimentos de subida",
+        "common_errors": "Subida muito rápida, não comunicar"
+      },
+      {
+        "id": "MAN-NV-03",
+        "name": "Início da descida",
+        "category": "Navegação",
+        "phase": "Navegação",
+        "description": "Procédimento para iniciar fase de aproximação",
+        "steps": [
+          "Calcular ponto de início de descida (Top of Descent)",
+          "Comunicar descida planejada",
+          "Reduzir proa gradualmente",
+          "Manter altitude de cruzeiro conforme procedimento"
+        ],
+        "prerequisites": "Planejamento de rota com TD",
+        "common_errors": "Descida muito tardia ou precoce, redução brusca de proa"
+      }
+    ]
+  },
+  "phases": {
+    "PS": {
+      "name": "Pré-Solo",
+      "color": "#3498db",
+      "description": "Fase inicial de instrução - 20 horas mínimas.",
+      "key_maneuvers": ["MAN-01", "MAN-02", "MAN-03", "MAN-04", "MAN-05", "MAN-06", "MAN-07", "MAN-08", "MAN-09", "MAN-12"]
+    },
+    "AP": {
+      "name": "Aperfeiçoamento",
+      "color": "#2ecc71",
+      "description": "Aprimoramento de habilidades - 10 horas mínimas.",
+      "key_maneuvers": ["MAN-04", "MAN-05", "MAN-07", "MAN-11"]
+    },
+    "NV": {
+      "name": "Navegação",
+      "color": "#9b59b6",
+      "description": "Operação avançada - 10 horas mínimas.",
+      "key_maneuvers": ["MAN-NV-01", "MAN-NV-02", "MAN-NV-03"]
+    },
+    "NOT": {
+      "name": "Noturno",
+      "color": "#e74c3c",
+      "description": "Operação noturna - 3 horas mínimas.",
+      "key_maneuvers": ["MAN-04", "MAN-05", "MAN-06", "MAN-07"]
+    }
+  }
+}

@@ -1,0 +1,5 @@
+# Icon placeholder - Create a proper .ico file
+# The application will work without an icon using the default window icon.
+# 
+# To create a proper icon, use an online converter or tool to convert
+# a PNG image (64x64 or 256x256 pixels) to .ico format.
