@@ -12,8 +12,40 @@ def resource_path(rel):
         base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base, rel)
 
-LEVEL_LABELS = {"E":"Elementar","A":"Aprendizagem","C":"Completar","M":"Medio","X":"Extra","a":"a - aux","c":"c - aux"}
-LEVEL_COLORS = {"E":"#95a5a6","A":"#3498db","C":"#2ecc71","M":"#f39c12","X":"#e74c3c","a":"#3498db","c":"#2ecc71"}
+LEVEL_LABELS = {"E":"Excelência","A":"Aplicação","C":"Compreensão","M":"Memorização","X":"Excelência Total","a":"Aplicação (aux)","c":"Compreensão (aux)"}
+LEVEL_COLORS = {"E":"#1DB954","A":"#3B82F6","C":"#F59E0B","M":"#95a5a6","X":"#8B5CF6","a":"#3B82F6","c":"#F59E0B"}
+
+LEVEL_OFICIAL = {
+    "M": ("M — Memorização", "Conhecer e memorizar a sequência. O IN demonstra e o aluno acompanha. Não se exige execução autônoma. Foco em nomenclatura e checklist."),
+    "C": ("C — Compreensão", "Executar COM auxílio direto do IN. O aluno age, mas o IN intervém e corrige. Demonstra compreensão da técnica."),
+    "A": ("A — Aplicação", "Executar com supervisão mínima. O AL realiza sozinho, IN apenas acompanha e intervém se necessário. Erros pequenos tolerados."),
+    "E": ("E — Execução", "Executar de forma autônoma e correta. Sem auxílio. Padrão de segurança e precisão já próximo ao solo."),
+    "X": ("X — Excelência", "Domínio total. Execução perfeita, dentro dos parâmetros, apto a voo solo e cheque (PS-X1/X2). Sem intervenção."),
+}
+# Fallback para minúsculas
+LEVEL_OFICIAL["a"] = LEVEL_OFICIAL["A"]
+LEVEL_OFICIAL["c"] = LEVEL_OFICIAL["C"]
+LEVEL_OFICIAL["m"] = LEVEL_OFICIAL["M"]
+
+def _official_charge(ex_name: str, level: str, mission_id: str) -> str:
+    lvl_key = level.strip() if level.strip() in LEVEL_OFICIAL else level.strip().upper()
+    title, desc = LEVEL_OFICIAL.get(lvl_key, (f"{level} — Nível exigido", "Executar conforme quadro de missões."))
+    # Detecta quem executa pelo texto do exercício
+    ex_low = ex_name.lower()
+    quem = ""
+    if "realizada pelo in" in ex_low and "al acompanha" in ex_low:
+        quem = "Nesta missão o IN demonstra e o AL acompanha (familiarização)."
+    elif "realizada pelo in" in ex_low:
+        quem = "Nesta missão o exercício é demonstrado/executado pelo IN."
+    elif "realizada pelo al" in ex_low:
+        quem = "Nesta missão o AL executa e o IN apenas acompanha/supervisiona."
+    elif "realizado pelo al" in ex_low:
+        quem = "Nesta missão o AL executa com supervisão mínima."
+    # Fase
+    fase = mission_id.split("-")[0] if "-" in mission_id else ""
+    fase_txt = {"PS":"Pré-Solo","AP":"Aperfeiçoamento","NV":"Navegação","NOT":"Noturno"}.get(fase, fase)
+    return f"{title}: {desc} {quem} Cobrança oficial do Programa de Instrução {fase_txt} — ficha de voo exige grau ≥3 em cada exercício; grau 1 (Perigoso) ou 2 (Deficiente) reprova a missão. Nível '{level}' deve constar na ficha como atingido."
+
 
 # Dicionário de erros comuns e dicas por exercício (chave = trecho do nome)
 EXERCISE_HELP = {
@@ -367,6 +399,8 @@ class MissionsView(ctk.CTkFrame):
             detail = ctk.CTkFrame(outer, fg_color=("#fef9e7","#1e1a0a"), corner_radius=6, border_width=1, border_color=("#f0c040","#8a6d00"))
             if is_open:
                 detail.grid(row=1, column=0, sticky="ew", padx=6, pady=(0,6))
+                ctk.CTkLabel(detail, text="📋 O que é cobrado (documento oficial):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#1f538d", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
+                ctk.CTkLabel(detail, text=f"• {_official_charge(name, level, m['id'])}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,6))
                 err_txt, dica_txt = _help_for(name)
                 ctk.CTkLabel(detail, text="⚠️ Erros comuns:", font=ctk.CTkFont(size=11, weight="bold"), text_color="#c0392b", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
                 ctk.CTkLabel(detail, text=f"• {err_txt}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,4))
@@ -379,6 +413,8 @@ class MissionsView(ctk.CTkFrame):
                     if self._ex_expanded[k]:
                         d.grid(row=1, column=0, sticky="ew", padx=6, pady=(0,6))
                         if not d.winfo_children():
+                            ctk.CTkLabel(d, text="📋 O que é cobrado (documento oficial):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#1f538d", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
+                            ctk.CTkLabel(d, text=f"• {_official_charge(ex_name, level, m['id'])}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,6))
                             e, di = _help_for(ex_name)
                             ctk.CTkLabel(d, text="⚠️ Erros comuns:", font=ctk.CTkFont(size=11, weight="bold"), text_color="#c0392b", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
                             ctk.CTkLabel(d, text=f"• {e}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,4))
