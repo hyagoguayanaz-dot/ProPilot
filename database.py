@@ -64,10 +64,10 @@ class DatabaseManager:
             "completed_missions": [],
             "mission_notes": {},
             "study_progress": {
-                "PS": {"completed": 0, "total": 4, "exercises_mastered": []},
-                "AP": {"completed": 0, "total": 1, "exercises_mastered": []},
-                "NV": {"completed": 0, "total": 1, "exercises_mastered": []},
-                "NOT": {"completed": 0, "total": 1, "exercises_mastered": []}
+                "PS": {"completed": 0, "total": 19, "exercises_mastered": []},
+                "AP": {"completed": 0, "total": 10, "exercises_mastered": []},
+                "NV": {"completed": 0, "total": 5, "exercises_mastered": []},
+                "NOT": {"completed": 0, "total": 2, "exercises_mastered": []}
             },
             "last_updated": datetime.now().isoformat(),
             "profile": {
@@ -94,6 +94,17 @@ class DatabaseManager:
                 for pk, pv in default_progress["profile"].items():
                     if pk not in existing.get("profile",{}):
                         existing["profile"][pk] = pv; changed=True
+                # migra totals para documento oficial (19/10/5/2)
+                expected_totals = {"PS":19,"AP":10,"NV":5,"NOT":2}
+                sp = existing.get("study_progress",{})
+                for ph, exp in expected_totals.items():
+                    if ph not in sp or sp[ph].get("total") != exp:
+                        if ph not in sp:
+                            sp[ph] = {"completed":0,"total":exp,"exercises_mastered":[]}
+                        else:
+                            sp[ph]["total"] = exp
+                        changed=True
+                existing["study_progress"] = sp
                 if changed:
                     self._save_progress(existing)
             except: pass
@@ -195,7 +206,7 @@ class DatabaseManager:
         progress = self.load_progress()
         phase_missions = [m for m in progress["completed_missions"] if m.startswith(phase)]
         count = len(phase_missions)
-        totals = {"PS": 4, "AP": 1, "NV": 1, "NOT": 1}
+        totals = {"PS": 19, "AP": 10, "NV": 5, "NOT": 2}
         total_expected = totals.get(phase, 1)
         # preserva total correto se já existia
         existing_total = progress.get("study_progress",{}).get(phase,{}).get("total", total_expected)
@@ -237,10 +248,10 @@ class DatabaseManager:
         progress = self.load_progress()
         progress["completed_missions"] = []
         progress["study_progress"] = {
-            "PS": {"completed": 0, "total": 4, "exercises_mastered": []},
-            "AP": {"completed": 0, "total": 1, "exercises_mastered": []},
-            "NV": {"completed": 0, "total": 1, "exercises_mastered": []},
-            "NOT": {"completed": 0, "total": 1, "exercises_mastered": []}
+            "PS": {"completed": 0, "total": 19, "exercises_mastered": []},
+            "AP": {"completed": 0, "total": 10, "exercises_mastered": []},
+            "NV": {"completed": 0, "total": 5, "exercises_mastered": []},
+            "NOT": {"completed": 0, "total": 2, "exercises_mastered": []}
         }
         self._save_progress(progress)
 
