@@ -71,7 +71,7 @@ class SettingsView(ctk.CTkFrame):
         self._accent_cards = {}
         for idx, (aid, info) in enumerate(ACCENTS.items()):
             is_sel = self.theme_manager and self.theme_manager.current_accent==aid
-            card = ctk.CTkFrame(grid, fg_color=acc if is_sel else cols["hover"], corner_radius=10, border_width=2, border_color=acc if is_sel else "transparent")
+            card = ctk.CTkFrame(grid, fg_color=acc if is_sel else cols["hover"], corner_radius=10, border_width=2 if is_sel else 0, border_color=acc)
             card.grid(row=idx//4, column=idx%4, padx=6, pady=6, sticky="ew")
             # bolinha
             dot = ctk.CTkButton(card, text="", width=38, height=38, corner_radius=19, fg_color=info["color"], hover_color=info["hover"], command=lambda a=aid: self._set_accent(a))
@@ -143,16 +143,52 @@ class SettingsView(ctk.CTkFrame):
 
     def _toggle_theme(self):
         if self.theme_manager:
-            self.theme_manager.set_theme(self.theme_var.get())
-            # atualiza preview cores
-            acc = self.theme_manager.get_accent()
-            hover = ACCENTS[self.theme_manager.current_accent]["hover"]
-            self._prev_btn.configure(fg_color=acc, hover_color=hover)
-            self._prev_bar.configure(progress_color=acc)
-            self._save_btn.configure(fg_color=acc, hover_color=hover)
+            new_theme = self.theme_var.get()
+            self.theme_manager.set_theme(new_theme)
+            # Reconstrói a view inteira para aplicar novas cores sem inversão
+            # salva estado temporário dos campos
             try:
-                self.combo_phase.configure(button_color=acc, button_hover_color=hover)
-                self.combo_status.configure(button_color=acc, button_hover_color=hover)
+                cur_name = self.entry_name.get()
+                cur_school = self.entry_school.get()
+                cur_hours = self.entry_hours.get()
+                cur_solo = self.entry_solo.get()
+                cur_phase = self.combo_phase.get()
+                cur_status = self.combo_status.get()
+            except: cur_name = cur_school = cur_hours = cur_solo = cur_phase = cur_status = None
+            for w in self.winfo_children():
+                w.destroy()
+            self._build()
+            # restaura campos (evita perder digitação)
+            try:
+                if cur_name is not None:
+                    self.entry_name.delete(0,"end"); self.entry_name.insert(0, cur_name)
+                    self.entry_school.delete(0,"end"); self.entry_school.insert(0, cur_school)
+                    self.entry_hours.delete(0,"end"); self.entry_hours.insert(0, cur_hours)
+                    self.entry_solo.delete(0,"end"); self.entry_solo.insert(0, cur_solo)
+                    self.combo_phase.set(cur_phase)
+                    self.combo_status.set(cur_status)
+                    self.theme_var.set(new_theme)
+            except: pass
+            # notifica app principal para atualizar sidebar/content
+            try:
+                app = self.winfo_toplevel()
+                if hasattr(app, "theme_manager"):
+                    cols = app.theme_manager.get_colors()
+                    acc = app.theme_manager.get_accent()
+                    app.configure(fg_color=cols["bg"])
+                    if hasattr(app, "sidebar"): app.sidebar.configure(fg_color=cols["sidebar"])
+                    if hasattr(app, "content_wrap"): app.content_wrap.configure(fg_color=cols["content"])
+                    if hasattr(app, "topbar"): app.topbar.configure(fg_color=cols["content"])
+                    if hasattr(app, "side_card"): app.side_card.configure(fg_color=cols["card"])
+                    if hasattr(app, "_highlight_nav") and hasattr(app, "_active_nav"):
+                        app._highlight_nav(app._active_nav)
+                    if hasattr(app, "_update_phase"): app._update_phase()
+                    # atualiza textos
+                    if hasattr(app, "top_title"): app.top_title.configure(text_color=cols["text"])
+                    if hasattr(app, "top_sub"): app.top_sub.configure(text_color=cols["subtext"])
+                    if hasattr(app, "theme_btn"):
+                        is_dark = app.theme_manager.current_theme=="dark"
+                        app.theme_btn.configure(text="🌙" if is_dark else "☀️", fg_color=cols["card"], hover_color=cols["hover"])
             except: pass
 
     def _set_accent(self, aid):
@@ -162,7 +198,7 @@ class SettingsView(ctk.CTkFrame):
             cols = _cols(self.theme_manager.current_theme)
             for k, card in self._accent_cards.items():
                 is_sel = k==aid
-                card.configure(fg_color=acc if is_sel else cols["hover"], border_color=acc if is_sel else "transparent")
+                card.configure(fg_color=acc if is_sel else cols["hover"], border_width=2 if is_sel else 0, border_color=acc)
                 for ch in card.winfo_children():
                     if isinstance(ch, ctk.CTkLabel):
                         ch.configure(text_color="white" if is_sel else (cols["text"] if "Spotify" in ch.cget("text") or "Ocean" in ch.cget("text") or "Violet" in ch.cget("text") or "Pink" in ch.cget("text") or "Sunset" in ch.cget("text") or "Crimson" in ch.cget("text") or "Teal" in ch.cget("text") or "Lime" in ch.cget("text") else cols["sub"]))
