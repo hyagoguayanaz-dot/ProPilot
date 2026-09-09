@@ -63,11 +63,26 @@ class ProPilotApp(ctk.CTk):
         self.show_dashboard()
 
     def _configure_window(self):
-        self.title("Pro Pilot - Piloto Privado de Aviao")
+        self.title("Pro Pilot")
         self.geometry("1120x720")
         self.minsize(1000, 620)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        # ícone
+        try:
+            import pathlib
+            ico = pathlib.Path(__file__).parent / "assets" / "icon.ico"
+            png = pathlib.Path(__file__).parent / "assets" / "icon.png"
+            if ico.exists():
+                self.iconbitmap(str(ico))
+            elif png.exists():
+                # fallback: usa PNG via iconphoto
+                from PIL import Image, ImageTk
+                im = Image.open(png).resize((32,32))
+                self._icon_img = ImageTk.PhotoImage(im)
+                self.iconphoto(True, self._icon_img)
+        except Exception:
+            pass
 
     def _setup_ui(self):
         # root container
@@ -94,7 +109,7 @@ class ProPilotApp(ctk.CTk):
         nav.grid_propagate(False)
         for t,k in [("Dashboard","dashboard"),("Missoes & Progresso","missions"),("Central de Estudos","study"),("Configuracoes","settings")]:
             ctk.CTkButton(nav, text=t, anchor="w", height=42, command=lambda kk=k: self._navigate_to(kk)).pack(fill="x", padx=10, pady=6)
-        ctk.CTkLabel(nav, text="Aeroclube de\nPirassununga", font=ctk.CTkFont(size=11), text_color=("gray50","gray60"), justify="center").pack(side="bottom", pady=14)
+        ctk.CTkLabel(nav, text="© Guayanaz Systems", font=ctk.CTkFont(size=11), text_color=("gray50","gray60"), justify="center").pack(side="bottom", pady=14)
 
         # Content
         self.content_frame = ctk.CTkFrame(main_container, corner_radius=10)

@@ -43,6 +43,8 @@ class DatabaseManager:
             },
             "last_updated": datetime.now().isoformat(),
             "profile": {
+                "display_name": "Piloto-Aluno",
+                "school": "Aeroclube de Pirassununga",
                 "total_flight_hours": 0,
                 "solo_hours": 0,
                 "current_phase": "PS",
@@ -82,7 +84,17 @@ class DatabaseManager:
         """Load user progress from file."""
         try:
             with open(self.progress_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+                # migracao: garante campos de perfil
+                prof = data.get("profile", {})
+                if "display_name" not in prof:
+                    prof["display_name"] = self.load_settings().get("display_name", "Piloto-Aluno")
+                if "school" not in prof:
+                    prof["school"] = self.load_settings().get("school", "Aeroclube de Pirassununga")
+                if "solo_hours" not in prof:
+                    prof["solo_hours"] = 0
+                data["profile"] = prof
+                return data
         except (FileNotFoundError, json.JSONDecodeError):
             self._init_default_progress()
             return self.load_progress()
