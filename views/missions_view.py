@@ -245,6 +245,7 @@ class MissionsView(ctk.CTkFrame):
         from database import get_database
         self.db = get_database()
         self.missions_data = {}
+        self.sop_data = {}
         self._selected_id = None
         # load data once
         try:
@@ -256,7 +257,49 @@ class MissionsView(ctk.CTkFrame):
         except Exception as e:
             print("missions load err", e)
             self.missions_data = {"missions":{},"requirements":{},"info":{}}
+        # SOP exercicios
+        try:
+            sp = resource_path(os.path.join("data","sop_exercises.json"))
+            if not os.path.exists(sp):
+                sp = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","sop_exercises.json")
+            with open(sp, encoding="utf-8") as f:
+                self.sop_data = json.load(f)
+        except Exception as e:
+            # fallback tenta sop.json
+            try:
+                sp2 = resource_path(os.path.join("data","sop.json"))
+                if not os.path.exists(sp2):
+                    sp2 = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data","sop.json")
+                with open(sp2, encoding="utf-8") as f:
+                    raw = json.load(f)
+                    # converte para lower keys curtos
+                    self.sop_data = {k.lower(): v for k,v in raw.items()}
+            except:
+                self.sop_data = {}
         self._build()
+
+    def _sop_for(self, ex_name: str) -> str:
+        if not getattr(self, "sop_data", None):
+            return ""
+        n = ex_name.lower()
+    # tenta match exato ou parcial
+        for key, txt in self.sop_data.items():
+            if key in n or n in key:
+                # limita tamanho
+                t = txt.strip()
+                if len(t) > 600:
+                    t = t[:580] + "…"
+                return t
+    # fallback por palavra-chave
+        for key, txt in self.sop_data.items():
+            # primeira palavra
+            first = key.split()[0] if key.split() else ""
+            if first and first in n:
+                t = txt.strip()
+                if len(t) > 600:
+                    t = t[:580] + "…"
+                return t
+        return ""
 
     def _build(self):
         self.grid_columnconfigure(0, weight=1)
@@ -401,6 +444,10 @@ class MissionsView(ctk.CTkFrame):
                 detail.grid(row=1, column=0, sticky="ew", padx=6, pady=(0,6))
                 ctk.CTkLabel(detail, text="📋 O que é cobrado (documento oficial):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#1f538d", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
                 ctk.CTkLabel(detail, text=f"• {_official_charge(name, level, m['id'])}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,6))
+                sop_txt = self._sop_for(name)
+                if sop_txt:
+                    ctk.CTkLabel(detail, text="📖 Procedimento SOP (ACP 2023 – P-56C Paulistinha):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#8e44ad", anchor="w").pack(anchor="w", padx=10, pady=(6,2))
+                    ctk.CTkLabel(detail, text=f"• {sop_txt}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,6))
                 err_txt, dica_txt = _help_for(name)
                 ctk.CTkLabel(detail, text="⚠️ Erros comuns:", font=ctk.CTkFont(size=11, weight="bold"), text_color="#c0392b", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
                 ctk.CTkLabel(detail, text=f"• {err_txt}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,4))
@@ -415,6 +462,10 @@ class MissionsView(ctk.CTkFrame):
                         if not d.winfo_children():
                             ctk.CTkLabel(d, text="📋 O que é cobrado (documento oficial):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#1f538d", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
                             ctk.CTkLabel(d, text=f"• {_official_charge(ex_name, level, m['id'])}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,6))
+                            sop2 = self._sop_for(ex_name)
+                            if sop2:
+                                ctk.CTkLabel(d, text="📖 Procedimento SOP (ACP 2023 – P-56C Paulistinha):", font=ctk.CTkFont(size=11, weight="bold"), text_color="#8e44ad", anchor="w").pack(anchor="w", padx=10, pady=(6,2))
+                                ctk.CTkLabel(d, text=f"• {sop2}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,6))
                             e, di = _help_for(ex_name)
                             ctk.CTkLabel(d, text="⚠️ Erros comuns:", font=ctk.CTkFont(size=11, weight="bold"), text_color="#c0392b", anchor="w").pack(anchor="w", padx=10, pady=(8,2))
                             ctk.CTkLabel(d, text=f"• {e}", wraplength=400, justify="left", font=ctk.CTkFont(size=11), anchor="w").pack(anchor="w", padx=10, pady=(0,4))
