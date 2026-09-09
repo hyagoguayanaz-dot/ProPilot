@@ -136,7 +136,7 @@ class SettingsView(ctk.CTkFrame):
         # 5) Sobre
         about = ctk.CTkFrame(scroll, fg_color=cols["card"], corner_radius=12); about.grid(row=4,column=0, sticky="ew", padx=10, pady=8)
         ctk.CTkLabel(about, text="Sobre", font=ctk.CTkFont(size=14, weight="bold"), text_color=cols["text"]).pack(anchor="w", padx=16, pady=(14,4))
-        ctk.CTkLabel(about, text="Pro Pilot v2.0 — Spotify Edition\nCurso de Piloto Privado de Avião (PPA) • Aeroclube de Pirassununga\n© Guayanaz Systems — Todos os direitos reservados.", justify="left", text_color=cols["sub"], font=ctk.CTkFont(size=12)).pack(anchor="w", padx=16, pady=(0,6))
+        ctk.CTkLabel(about, text="Pro Pilot v2.0\nCurso de Piloto Privado de Avião (PPA) • Aeroclube de Pirassununga\n© Guayanaz Systems — Todos os direitos reservados.", justify="left", text_color=cols["sub"], font=ctk.CTkFont(size=12)).pack(anchor="w", padx=16, pady=(0,6))
         ctk.CTkLabel(about, text="© 2026 Guayanaz Systems", font=ctk.CTkFont(size=11, slant="italic"), text_color=cols["sub"]).pack(anchor="w", padx=16, pady=(0,14))
 
         self._load()

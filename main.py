@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Pro Pilot - Spotify Edition
-UI moderna inspirada no Spotify com paleta de cores selecionável
+Pro Pilot - Aviation Training Application
+UI moderna com paleta de cores selecionável
 """
 import customtkinter as ctk
 import sys, os
