@@ -34,7 +34,7 @@ version = 2.0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = hostpython3==3.11.8,python3==3.11.8,kivy==2.3.0,kivymd==2.0.0,Pillow
+requirements = python3,kivy==2.3.0,kivymd==2.0.0,Pillow
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -154,53 +154,7 @@ android.accept_sdk_license_agreements = True
 #p4a.fork = kivy
 
 # (str) Specific branch you want to use. If not specified, will use the bootstrap's default branch
-#p4a.branch = master
-
-# (str) SSL CA key if you want to use specific one
-#p4a.ssl_ca_key =
-
-# (list) python-for-android whitelist
-#android.whitelist =
-
-# (bool) If you want to enable Android copy libs
-#android.copy_libs = False
-
-# (str) If you want to specify a local python-for-android to use
-#p4a.local_recipes =
-
-# (list) --blacklist an android requirement, it will be ignored when searching for recipes
-# example: you want to blacklist android's copy of sqlite3 so you use the python one.
-#android.blacklist =
-
-# (bool) If True, then skip trying to update the Android ant, sdk, platfrom
-# tools (and all other dependant tools)
-#android.skip_update = False
-
-# (bool) If True, then skip trying to update the Android ant, sdk, platfrom
-# tools (and all other dependant tools)
-
-# (str) The Android arch to build for. Valid values are armeabi-v7a, arm64-v8a, x86, x86_64
-android.archs = arm64-v8a, armeabi-v7a
-
-# (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)
-#android.port =
-
-# (str) Extra P4A arguments e.g. '--enable-androidx --debug-allowed'
-#p4a.extra_args =
-
-
-#
-# Python for android (p4a) specific
-#
-
-# (str) python-for-android URL to use for checkout
-#p4a.url =
-
-# (str) python-for-android fork to use in case you want to use a specific fork
-#p4a.fork = kivy
-
-# (str) python-for-android branch to use, defaults to master
-#p4a.branch = master
+p4a.branch = develop
 
 # (str) python-for-android specific commit to use (if specified, will override branch/fork)
 #p4a.commit = HEAD

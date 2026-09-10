@@ -3,6 +3,9 @@ set -e
 cd /home/user/hostcwd
 export PATH=$HOME/.local/bin:$PATH
 echo "=== Buildozer fix: aceitando licenças SDK ==="
+echo "[fix] Instalando python3-dev e libgl para corrigir NOTNONE..." 
+sudo apt update -qq 2>&1 | tail -3 || true
+sudo apt install -y python3-dev libgl1-mesa-dev libgles2-mesa-dev 2>&1 | tail -5 || true
 # Tenta buildozer uma vez para baixar SDK (pode falhar na licença)
 buildozer android debug 2>&1 | tee /tmp/build1.log || true
 # Se falhou por licença, aceita manualmente
