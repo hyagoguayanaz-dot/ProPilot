@@ -17,14 +17,20 @@ jobs:
 
       - name: Install system deps
         run: |
-          sudo -S -p '' apt update
-          sudo -S -p '' apt install -y openjdk-17-jdk unzip wget python3-pip python3-setuptools
-          sudo -S -p '' apt install -y libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          sudo apt update
+          sudo apt install -y openjdk-17-jdk unzip wget python3-pip python3-setuptools
+          sudo apt install -y libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
 
       - name: Install buildozer & cython
         run: |
           pip install --upgrade pip
           pip install buildozer cython==0.29.36 kivy==2.3.0 kivymd==2.0.0 Pillow
+
+      - name: Accept Android SDK licenses
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk
+          yes | sdkmanager --licenses 2>&1 | head -20 || echo "sdkmanager not yet installed - will be handled by buildozer"
+          # fallback: buildozer will auto-accept via spec flag
 
       - name: Build APK (debug)
         working-directory: mobile
