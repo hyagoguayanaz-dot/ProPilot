@@ -18,8 +18,7 @@ jobs:
       - name: Install system deps
         run: |
           sudo apt update
-          sudo apt install -y openjdk-17-jdk unzip wget python3-pip python3-setuptools
-          sudo apt install -y libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          sudo apt install -y openjdk-17-jdk unzip wget python3-pip python3-setuptools autoconf automake libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev || sudo apt install -y openjdk-17-jdk unzip wget python3-pip autoconf libtool pkg-config zlib1g-dev cmake libffi-dev libssl-dev || true
 
       - name: Install buildozer & cython
         run: |
