@@ -1,0 +1,234 @@
+{
+  "info": {
+    "title": "QRH e Manuais de Operação - Frota PPA",
+    "updated": "2026-09-09",
+    "nota": "Quick Reference condensado para estudo. Sempre consulte o POH/AFM oficial da aeronave antes do voo. Valores são típicos de referência."
+  },
+  "aircraft": [
+    {
+      "id": "c152",
+      "name": "Cessna 152",
+      "icao": "C152",
+      "role": "Treinamento básico Pré-Solo",
+      "image_hint": "Trem triciclo, Lycoming O-235, 2 lugares",
+      "overview": "Aeronave monomotor a pistão mais usada no Pré-Solo. Estável, perdoa erros de pilotagem e ideal para circuitos, estol e pousos. Frota padrão do Aeroclube de Pirassununga.",
+      "specs": {
+        "Motor": "Lycoming O-235-L2C 110 HP",
+        "Hélice": "McCauley bipá passo fixo",
+        "Combustível": "Avgas 100LL — 98 L total (92 L utilizável) em 2 tanques",
+        "Óleo": "6 qt máx / 4 qt mín",
+        "Peso máx decolagem": "757 kg (1670 lb)",
+        "Assentos": "2",
+        "Trem": "Triciclo fixo"
+      },
+      "limitations": {
+        "Vne (nunca exceder)": "149 KIAS",
+        "Vno (máx cruzeiro estrutural)": "111 KIAS",
+        "Va (manobra)": "104 KIAS (757 kg) / 93 KIAS (menos peso)",
+        "Vfe (flape estendido)": "85 KIAS",
+        "Vs (estol limpo)": "48 KIAS",
+        "Vso (estol flape cheio)": "43 KIAS",
+        "Vx (melhor ângulo)": "55 KIAS",
+        "Vy (melhor razão)": "67 KIAS",
+        "Vglide (planeio)": "60 KIAS",
+        "Vento través máx demonstrado": "12 kt",
+        "Fator de carga": "+4,4 / -1,76 G"
+      },
+      "normal_procedures": [
+        {"title": "Antes da partida", "checklist": ["Documentos e peso/CG OK", "Chave ignição OFF, master OFF", "Inspeção externa completa (checklist C152)", "Combustível e óleo verificados", "Calços e amarração removidos"]},
+        {"title": "Partida", "checklist": ["Freio estacionado", "Master ON, beacon ON", "Mistura rica, carburador frio OFF", "Hélice livre — chamada", "Partida: chave START até pegar", "Óleo pressão subindo em 30 s", "Rádio e transponder ON"]},
+        {"title": "Taxi", "checklist": ["Teste freios nos primeiros metros", "Instrumentos giroscópicos OK", "Bússola vs direção", "Farois conforme"]},
+        {"title": "Antes da decolagem (GUMPS)", "checklist": ["Combustível — ambos ON e indicadores", "Mistura — rica", "Carburador — conforme OAT", "Flape — conforme POH (0° normal)", "Compensador — takeoff", "Portas travadas", "Comandos livres e corretos"]},
+        {"title": "Decolagem normal", "checklist": ["Potência máxima 2300+ RPM", "Velocidade viva, leme para eixo", "Rotação 50-55 KIAS", "Subida Vy 67 KIAS até 500 ft"]},
+        {"title": "Cruzeiro", "checklist": ["Potência 2100-2400 RPM", "Mistura ajustada para altitude", "Compensado, esfera no centro"]},
+        {"title": "Antes do pouso (GUMPS)", "checklist": ["Combustível — OK", "Mistura — rica", "Carburador — ON se necessário", "Flape — conforme", "Trem — fixo (confirme luz)", "Hélice — passo fixo"]},
+        {"title": "Pouso normal", "checklist": ["Final 65 KIAS (flape 30°)", "Rampa com potência, eixo com leme", "Flare 1 m, toque trem principal", "Freio progressivo, flape recolhe só após dominar"]},
+        {"title": "Corte", "checklist": ["Avionics OFF", "Mistura corta", "Chave OFF, master OFF", "Calços, amarras, capas"]}
+      ],
+      "qrh": [
+        {"title": "🔥 Fogo no motor na partida", "memory": true, "steps": ["Starter — continue girando para sugar fogo", "Mistura — corta", "Torneira — fecha", "Master — OFF", "Se persistir: abandone aeronave, extintor"]},
+        {"title": "🔥 Fogo em voo", "memory": true, "steps": ["Mistura — corta", "Torneira — fecha", "Master — OFF", "Cabine — ventile, portas entreabertas", "Velocidade — 85 KIAS para apagar", "Pouso forçado imediato"]},
+        {"title": "⚡ Falha elétrica total", "steps": ["Master — ciclagem OFF/ON", "Alternador — OFF/ON, verifique disjuntores", "Se não voltar: reduza carga (avionics OFF, luzes OFF)", "Pouso no aeródromo mais próximo, informe na fonia se possível"]},
+        {"title": "🛬 Falha de motor após decolagem", "memory": true, "steps": ["Nariz — BAIXE imediato para 60 KIAS", "Área — escolha à frente (±30°), não tente voltar", "Mistura — rica, carburador — quente ON, bomba — ON", "Torneira — ambos, magnetos — ambos", "Se não reacender: flape conforme necessário, pouso forçado"]},
+        {"title": "🌀 Estol inadvertido", "memory": true, "steps": ["Manche — à frente (reduz ângulo de ataque)", "Potência — máxima", "Asas — nivelar com PEDAL (não aileron)", "Saia do estol, depois recupere altitude"]},
+        {"title": "🧊 Gelo de carburador", "steps": ["Sintoma: queda RPM/pressão, motor áspero", "Carburador quente — ON, aguarde", "Mistura — ajuste, potência — confirme", "Se persistir: pouso preventivo"]},
+        {"title": "💨 Pane de vácuo (atitude/DG)", "steps": ["Confie em horizonte visual + turn coordinator", "Mantenha asas niveladas, proa com bússola", "Evite IMC, pouse VFR"]}
+      ],
+      "performance": {
+        "Decolagem (nível do mar, 15°C)": "Rolagem ~250 m / 480 m para 15 m",
+        "Pouso": "Rolagem ~135 m / 400 m para 15 m",
+        "Razão subida": "~715 fpm ao nível do mar",
+        "Alcance (45 min reserva, 75%)": "~415 NM",
+        "Consumo cruzeiro": "~23 L/h a 75%",
+        "Teto serviço": "14700 ft"
+      },
+      "quick_ref": {
+        "Circuito": "1000 ft AGL, 80 KIAS contravento, 70 base, 65 final",
+        "Arremetida": "Potência máxima, flape 20°→10°→0° em etapas, Vy 67 KIAS",
+        "Emergência frequências": "121.5 MHz / Transponder 7700",
+        "Checklist memória GUMPS": "Gas, Undercarriage, Mixture, Prop, Safety"
+      }
+    },
+    {
+      "id": "c172s",
+      "name": "Cessna 172S Skyhawk SP",
+      "icao": "C172",
+      "role": "Aeronave principal PPA — Navegação e Noturno",
+      "image_hint": "Lycoming IO-360 180 HP, G1000 opcional, 4 lugares",
+      "overview": "Workhorse da frota PPA. 180 HP, mais estável em navegação e com melhor performance que o 152. Usado em AP, NV e NOT. Este QRH cobre C172S com Lycoming IO-360-L2A.",
+      "specs": {
+        "Motor": "Lycoming IO-360-L2A 180 HP, injeção",
+        "Hélice": "McCauley bipá passo fixo",
+        "Combustível": "Avgas 100LL — 212 L total (200 L utilizável)",
+        "Óleo": "8 qt máx / 5 qt mín",
+        "Peso máx decolagem": "1157 kg (2550 lb)",
+        "Peso máx pouso": "1157 kg",
+        "Assentos": "4 (2+2)",
+        "Trem": "Triciclo fixo"
+      },
+      "limitations": {
+        "Vne": "163 KIAS",
+        "Vno": "128 KIAS",
+        "Va (2550 lb)": "105 KIAS",
+        "Vfe (10°/30°)": "110 / 85 KIAS",
+        "Vs (limpo)": "51 KIAS",
+        "Vso (30°)": "40 KIAS",
+        "Vx": "62 KIAS",
+        "Vy": "74 KIAS",
+        "Vglide (best glide)": "65 KIAS",
+        "Vento través máx demonstrado": "15 kt"
+      },
+      "normal_procedures": [
+        {"title": "Antes da partida", "checklist": ["ATIS, peso/CG, NOTAM", "Inspeção externa C172S (13 pontos)", "Combustível: drenos, quantidade, tampa", "Óleo 5-8 qt"]},
+        {"title": "Partida injeção", "checklist": ["Bomba — ON 3-5 s depois OFF (prime)", "Mistura — rica, hélice livre", "Master ON, start até pegar", "Óleo pressão em 30 s, avionics ON"]},
+        {"title": "Antes da decolagem", "checklist": ["GUMPS completo", "Flape 0° normal / 10° curta", "Compensador takeoff", "Portas travadas, cinto", "Teste magnetos: queda <150 RPM, dif <50 RPM"]},
+        {"title": "Decolagem / Subida", "checklist": ["Potência 2300+ RPM, eixo com leme", "Rotação 55 KIAS, Vx 62 kt (obstáculo) ou Vy 74 kt", "500 ft: flape 0°, após 1000 ft: cruzeiro"]},
+        {"title": "Cruzeiro", "checklist": ["Potência 2100-2500 RPM, mistura EGT/POH", "Trimado, lean conforme altitude"]},
+        {"title": "Descida / Aproximação", "checklist": ["ATIS, briefing pouso, GUMPS", "Descida 500 fpm, 85 KIAS com 10° flape"]},
+        {"title": "Pouso", "checklist": ["Final 65-70 KIAS (flape 30°), 60 kt curta", "Flare olhando fim da pista, toque principal", "Freio progressivo"]},
+        {"title": "Noturno (adicional)", "checklist": ["Luzes: beacon, nav, strobe, pouso, painel", "Teste farol, luzes de taxi", "Instrumentos iluminados, lanterna a bordo"]}
+      ],
+      "qrh": [
+        {"title": "🔥 Fogo no motor em voo", "memory": true, "steps": ["Mistura — CORTA", "Torneira — FECHA", "Master — OFF", "Cabine — aquece OFF, ventile", "Velocidade — 85 KIAS (tenta apagar)", "Pouso forçado — 65 KIAS final"]},
+        {"title": "🔥 Fogo elétrico", "memory": true, "steps": ["Master — OFF", "Vents — feche", "Extintor — se disponível", "Pouso imediato"]},
+        {"title": "⚙️ Falha de motor em voo", "memory": true, "steps": ["Estabeleça 65 KIAS (best glide)", "Torneira — ambos, mistura — rica", "Bomba — ON", "Magnetos — ambos, verifique", "Se não reacender: escolha área, 7700, pouso forçado"]},
+        {"title": "🛩️ Falha de motor na decolagem (baixa altura)", "memory": true, "steps": ["Nariz — 65 KIAS imediato", "Não retorne à pista se <800 ft", "Flape conforme necessário", "Pouse à frente"]},
+        {"title": "⚡ Alternador inoperante (VOLTS <24V)", "steps": ["Master — OFF/ON, alternador — OFF/ON", "Disjuntor — verifique", "Se não voltar: desligue não essenciais, pouse em 30 min (bateria)"]},
+        {"title": "🧊 Gelo indução / injeção", "steps": ["Alternate air — ON", "Potência — confirme", "Se áspero: mistura ajuste, pouse preventivo"]},
+        {"title": "🌬️ Windshear / rajada no pouso", "memory": true, "steps": ["Arremetida imediata se instável", "Potência máxima, flape 20°→10°→0°", "Vy ou Vx conforme obstáculo"]},
+        {"title": "📻 Falha de rádio (VFR)", "steps": ["Transponder — 7600", "Permaneça VFR, entre tráfego com luzes, observe torre (pistola)"]}
+      ],
+      "performance": {
+        "Decolagem 15°C nível do mar": "Rolagem 290 m / 520 m p/ 15 m",
+        "Pouso": "Rolagem 170 m / 415 m p/ 15 m",
+        "Subida": "~720 fpm",
+        "Cruzeiro 75% a 8000 ft": "~124 KTAS, 32 L/h",
+        "Alcance 55% com reserva": "~640 NM",
+        "Autonomia típica": "~5 h + reserva"
+      },
+      "quick_ref": {
+        "Velocidades circuito": "80/80/70/65 KIAS (subida/contravento/base/final)",
+        "Arremetida": "Full power, carb heat OFF, flape 20→10→0, Vy 74 KIAS",
+        "Emergência": "7700 / 121.5",
+        "Atalho G1000": "NRST → aeroporto mais próximo"
+      }
+    },
+    {
+      "id": "p56",
+      "name": "Neiva P-56 Paulistinha",
+      "icao": "P56",
+      "role": "Clássico — Instrução básica e táxi aéreo histórico",
+      "image_hint": "Trem convencional (taildragger), Continental O-200, asa alta",
+      "overview": "Clássico brasileiro de asa alta e trem convencional (taildragger). Exige mais técnica no taxi/decolagem/pouso. Usado em instrução de adaptação e hora de cauda. Referência P-56C com Continental O-200-A.",
+      "specs": {
+        "Motor": "Continental O-200-A 100 HP",
+        "Hélice": "Sensenich bipá madeira/metal passo fixo",
+        "Combustível": "Avgas 100LL — ~100 L",
+        "Peso máx": "680 kg",
+        "Assentos": "2 em tandem",
+        "Trem": "Convencional (rodinha traseira)"
+      },
+      "limitations": {
+        "Vne": "130 KIAS",
+        "Vno": "105 KIAS",
+        "Va": "85 KIAS",
+        "Vfe": "70 KIAS",
+        "Vs (limpo)": "42 KIAS",
+        "Vso (flape)": "38 KIAS",
+        "Vx": "52 KIAS",
+        "Vy": "62 KIAS",
+        "Vglide": "60 KIAS",
+        "Vento través máx": "10 kt (taildragger)"
+      },
+      "normal_procedures": [
+        {"title": "Taxi (taildragger)", "checklist": ["Manche ATRÁS (cauda no chão) no início", "Teste freios e leme de cauda", "Curvas com freio diferencial + leme", "Vento: manche contra vento"]},
+        {"title": "Decolagem", "checklist": ["Alinhe, manche atrás, potência suave", "Levante cauda com leme (visão à frente)", "Acelere em 3 pontos, rotação 45 KIAS, subida Vy 62 KIAS"]},
+        {"title": "Pouso 3 pontos", "checklist": ["Final 60 KIAS, motor ~1500 RPM", "Arredonde, corte, toque 3 pontos simultâneos", "Manche atrás após toque, freio leve"]},
+        {"title": "Pouso de pista (wheel landing)", "checklist": ["Final 65 KIAS", "Toque só trem principal, cauda alta", "Rode com leme, manche à frente para manter cauda em cima, depois atrás"]}
+      ],
+      "qrh": [
+        {"title": "⚠️ Cavalo de pau no pouso", "memory": true, "steps": ["Potência — idle", "Leme — corrija com pedal (não freio brusco)", "Manche — atrás para manter cauda", "Se perder controle: freio suave, tente manter eixo"]},
+        {"title": "🔥 Fogo / falha motor", "steps": ["Mistura corta, torneira fecha, master OFF", "Taildragger: pouso à frente, manche atrás no final para não capotar"]},
+        {"title": "💨 Capotamento iminente", "memory": true, "steps": ["Manche — TOTALMENTE atrás", "Freio — solte", "Motor — corte se necessário"]}
+      ],
+      "performance": {
+        "Decolagem": "Rolagem ~180 m",
+        "Pouso": "Rolagem ~150 m",
+        "Subida": "~600 fpm",
+        "Cruzeiro 75%": "~85 KTAS",
+        "Consumo": "~19 L/h"
+      },
+      "quick_ref": {
+        "Circuito taildragger": "80/70/60 KIAS, atenção deriva no pouso",
+        "Macete": "Olhe fim da pista no flare, não painel",
+        "Emergência": "7700 — prefira pouso em gramado se disponível"
+      }
+    },
+    {
+      "id": "pa28",
+      "name": "Piper PA-28 Cherokee 140",
+      "icao": "P28A",
+      "role": "Aeronave alternativa — Navegação",
+      "image_hint": "Asa baixa, Lycoming O-320, 4 lugares, trem triciclo",
+      "overview": "Asa baixa, mais usada em navegação e adaptação asa baixa. Estável em cruzeiro, boa visibilidade lateral. Complementa C172 na fase NV.",
+      "specs": {
+        "Motor": "Lycoming O-320-E2A 150 HP",
+        "Combustível": "Avgas 100LL — 189 L (182 L utilizável)",
+        "Peso máx": "975 kg",
+        "Assentos": "4",
+        "Trem": "Triciclo fixo"
+      },
+      "limitations": {
+        "Vne": "149 KIAS",
+        "Vno": "126 KIAS",
+        "Va": "105 KIAS",
+        "Vfe": "100 KIAS",
+        "Vs": "55 KIAS",
+        "Vso": "49 KIAS",
+        "Vx": "64 KIAS",
+        "Vy": "79 KIAS",
+        "Vglide": "73 KIAS"
+      },
+      "normal_procedures": [
+        {"title": "Antes da partida", "checklist": ["Drenos combustível (3 pontos)", "Óleo 4-6 qt", "Flape 0°, compensador neutro"]},
+        {"title": "Decolagem", "checklist": ["Potência máxima, rotação 55 KIAS", "Vy 79 KIAS"]},
+        {"title": "Pouso", "checklist": ["Final 75 KIAS (0°), 70 KIAS (25°), 65 curta", "Toque principal, direção com leme"]},
+        {"title": "Tanques", "checklist": ["Selecione tanque com mais combustível para decolagem/pouso", "Troque a cada 30 min em cruzeiro"]}
+      ],
+      "qrh": [
+        {"title": "Falha motor", "memory": true, "steps": ["73 KIAS best glide", "Bomba ON, troca tanque, mistura rica", "Magnetos ambos", "Se nada: pouso forçado"]},
+        {"title": "Fogo", "steps": ["Mistura corta, torneira OFF, master OFF, pouso imediato"]}
+      ],
+      "performance": {
+        "Decolagem": "420 m p/ 15 m",
+        "Pouso": "380 m p/ 15 m",
+        "Subida": "~650 fpm",
+        "Cruzeiro 75%": "~115 KTAS"
+      },
+      "quick_ref": {
+        "Circuito": "90/85/75/70 KIAS",
+        "Combustível": "Troca de tanque a cada 30 min"
+      }
+    }
+  ]
+}
